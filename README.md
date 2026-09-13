@@ -28,6 +28,14 @@ Open [http://localhost:3010/passion](http://localhost:3010/passion) (direct) or 
 
 **Production URL on this server:** [http://217.160.139.56/passion](http://217.160.139.56/passion)
 
+### Admin stats (`/passion/admin`)
+
+Allowlisted email (default `vleschinskii@gmail.com`) + `ADMIN_TOKEN` from `.env`.
+
+- UI: [/passion/admin/](https://217.160.139.56/passion/admin/)
+- CSV export: `/passion/api/admin/export` (after login)
+- Configure emails: `ADMIN_EMAILS=a@x.com,b@y.com`
+
 Default DB URL: `postgresql://passion:passion@localhost:5433/passion`
 
 ### Production gateway (`/passion` on port 80)

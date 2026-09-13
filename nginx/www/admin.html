@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Passion · Admin</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    min-height: 100vh;
+    font-family: "Segoe UI", Roboto, system-ui, sans-serif;
+    color: #e6f0fa;
+    background: radial-gradient(circle at 20% 10%, #142b42 0%, #081420 60%, #03080f 100%);
+    padding: 28px 16px 60px;
+  }
+  .wrap { max-width: 1100px; margin: 0 auto; }
+  h1 {
+    font-size: 1.6rem; font-weight: 700; letter-spacing: -0.4px;
+    background: linear-gradient(90deg, #9fd0ff, #e2c98a);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .sub { opacity: .55; margin: 6px 0 22px; font-size: .88rem; }
+  .card {
+    background: rgba(255,255,255,.055);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 22px;
+    padding: 22px;
+    margin-bottom: 16px;
+    backdrop-filter: blur(12px);
+  }
+  .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+  }
+  .stat {
+    background: rgba(63,142,208,.1);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 16px;
+    padding: 14px 16px;
+  }
+  .stat b { display: block; font-size: 1.45rem; color: #fff; margin-top: 4px; }
+  .stat span { font-size: .78rem; opacity: .65; }
+  label { display: block; font-size: .82rem; opacity: .7; margin-bottom: 6px; }
+  input {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,.18);
+    background: rgba(0,0,0,.25);
+    color: #fff;
+    margin-bottom: 12px;
+  }
+  button, .btn {
+    border: 0; border-radius: 999px; padding: 11px 18px; font-weight: 700;
+    cursor: pointer; color: #fff;
+    background: linear-gradient(135deg, #2e6ea6, #3f8ed0);
+  }
+  button.ghost, .btn.ghost {
+    background: rgba(255,255,255,.08);
+    border: 1px solid rgba(255,255,255,.14);
+  }
+  button.good {
+    background: linear-gradient(135deg, #2f8a74, #5fc1b0);
+  }
+  .err { color: #f0b0b0; margin-top: 8px; font-size: .9rem; }
+  .ok { color: #8fdccf; margin-top: 8px; font-size: .9rem; }
+  table { width: 100%; border-collapse: collapse; font-size: .86rem; }
+  th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid rgba(255,255,255,.08); vertical-align: top; }
+  th { opacity: .55; font-weight: 600; font-size: .75rem; text-transform: uppercase; letter-spacing: .4px; }
+  .bar {
+    height: 10px; border-radius: 999px; background: rgba(255,255,255,.08);
+    overflow: hidden; margin-top: 8px;
+  }
+  .bar > i { display: block; height: 100%; background: linear-gradient(90deg, #3f8ed0, #5fc1b0); }
+  .muted { opacity: .55; font-size: .8rem; }
+  .top { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; flex-wrap: wrap; margin-bottom: 8px; }
+  .pill {
+    display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: .75rem; font-weight: 600;
+    background: rgba(255,255,255,.08); margin-right: 6px;
+  }
+  .pill.passi { background: rgba(241,178,74,.2); color: #f7cd84; }
+  .pill.garm { background: rgba(95,193,176,.2); color: #8fdccf; }
+  .pill.sub { background: rgba(176,124,158,.2); color: #d6a8c4; }
+  .login-wrap { max-width: 420px; margin: 80px auto; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+  <div class="card login-wrap" id="loginView">
+    <h1>Passion Admin</h1>
+    <p class="sub">Вход только для разрешённых адресов.</p>
+    <form id="loginForm">
+      <label for="email">Email</label>
+      <input id="email" type="email" required autocomplete="username" value="vleschinskii@gmail.com" />
+      <label for="password">Admin token</label>
+      <input id="password" type="password" required autocomplete="current-password" />
+      <button type="submit">Войти</button>
+      <p class="err" id="loginErr"></p>
+    </form>
+  </div>
+
+  <div id="dashView" class="hidden">
+    <div class="top">
+      <div>
+        <h1>Статистика сбора данных</h1>
+        <p class="sub" id="who">—</p>
+      </div>
+      <div class="row">
+        <a class="btn good" id="exportBtn" href="/passion/api/admin/export">Экспорт CSV</a>
+        <button type="button" class="ghost" id="logoutBtn">Выйти</button>
+      </div>
+    </div>
+
+    <div class="grid" id="summary"></div>
+
+    <div class="card" style="margin-top:16px">
+      <h3 style="margin-bottom:12px">Типы по Гумилёву (все ответы)</h3>
+      <div id="guesses"></div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom:12px">BFI · доля «Да»</h3>
+      <div id="bfi"></div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom:12px">По книгам</h3>
+      <div style="overflow:auto"><table><thead><tr><th>Книга</th><th>Ответы</th><th>Пасс.</th><th>Гарм.</th><th>Суб.</th></tr></thead><tbody id="byBook"></tbody></table></div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom:12px">По героям</h3>
+      <div style="overflow:auto; max-height:420px"><table><thead><tr><th>Герой</th><th>Книга</th><th>Ответы</th><th>Распределение</th></tr></thead><tbody id="byHero"></tbody></table></div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom:12px">Ответы по дням</h3>
+      <div id="daily"></div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom:12px">Последние ответы</h3>
+      <div style="overflow:auto; max-height:460px"><table><thead><tr><th>Когда</th><th>Герой</th><th>Тип</th><th>BFI</th><th>Respondent</th></tr></thead><tbody id="recent"></tbody></table></div>
+    </div>
+  </div>
+</div>
+<script>
+const API = '/passion/api/admin';
+const GUESS = { passi: 'Пассионарий', garm: 'Гармоничный', sub: 'Субпассионарий' };
+const BFI_LABEL = { O: 'Открытость', C: 'Добросовестность', E: 'Экстраверсия', A: 'Доброжелательность', N: 'Нейротизм' };
+
+async function api(path, opts = {}) {
+  const res = await fetch(API + path, { credentials: 'same-origin', cache: 'no-store', ...opts });
+  return res;
+}
+
+function showLogin() {
+  document.getElementById('loginView').classList.remove('hidden');
+  document.getElementById('dashView').classList.add('hidden');
+}
+function showDash() {
+  document.getElementById('loginView').classList.add('hidden');
+  document.getElementById('dashView').classList.remove('hidden');
+}
+
+document.getElementById('loginForm').onsubmit = async (e) => {
+  e.preventDefault();
+  const err = document.getElementById('loginErr');
+  err.textContent = '';
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+  const res = await api('/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+  });
+  if (!res.ok) {
+    err.textContent = 'Неверный email или token';
+    return;
+  }
+  await loadStats();
+};
+
+document.getElementById('logoutBtn').onclick = async () => {
+  await api('/logout', { method: 'POST' });
+  showLogin();
+};
+
+function pct(n) { return Math.round(n * 1000) / 10 + '%'; }
+
+async function loadStats() {
+  const me = await api('/me');
+  if (!me.ok) { showLogin(); return; }
+  const meData = await me.json();
+  document.getElementById('who').textContent = meData.email + ' · обновлено ' + new Date().toLocaleString('ru-RU');
+  showDash();
+
+  const res = await api('/stats');
+  if (!res.ok) { showLogin(); return; }
+  const data = await res.json();
+  const s = data.summary;
+  document.getElementById('summary').innerHTML = [
+    ['Респонденты', s.respondentsTotal],
+    ['С ответами', s.respondentsWithAnswers],
+    ['Завершили', s.respondentsCompleted],
+    ['Ответы по героям', s.answersTotal],
+    ['Email-интересы', s.interestsTotal],
+    ['Книги / герои', s.publishedBooks + ' / ' + s.publishedHeroes],
+  ].map(([label, val]) => `<div class="stat"><span>${label}</span><b>${val}</b></div>`).join('');
+
+  const gt = data.guessTotals;
+  const gTotal = (gt.passi||0)+(gt.garm||0)+(gt.sub||0) || 1;
+  document.getElementById('guesses').innerHTML = ['passi','garm','sub'].map(k => {
+    const n = gt[k]||0;
+    return `<div style="margin-bottom:10px"><div class="row" style="justify-content:space-between"><span class="pill ${k}">${GUESS[k]}</span><b>${n}</b></div><div class="bar"><i style="width:${(n/gTotal)*100}%"></i></div></div>`;
+  }).join('');
+
+  document.getElementById('bfi').innerHTML = Object.entries(data.bfiYesRates).map(([k,v]) =>
+    `<div style="margin-bottom:10px"><div class="row" style="justify-content:space-between"><span>${BFI_LABEL[k]||k}</span><b>${v.yes}/${v.total} · ${pct(v.rate)}</b></div><div class="bar"><i style="width:${v.rate*100}%"></i></div></div>`
+  ).join('');
+
+  document.getElementById('byBook').innerHTML = data.byBook.map(b =>
+    `<tr><td>${b.titleRu}</td><td>${b.answers}</td><td>${b.guesses.passi||0}</td><td>${b.guesses.garm||0}</td><td>${b.guesses.sub||0}</td></tr>`
+  ).join('') || '<tr><td colspan="5" class="muted">Пока нет ответов</td></tr>';
+
+  document.getElementById('byHero').innerHTML = data.byHero.map(h =>
+    `<tr><td>${h.nameRu}</td><td class="muted">${h.bookTitleRu}</td><td>${h.answers}</td><td>
+      <span class="pill passi">${h.guesses.passi||0}</span>
+      <span class="pill garm">${h.guesses.garm||0}</span>
+      <span class="pill sub">${h.guesses.sub||0}</span>
+    </td></tr>`
+  ).join('') || '<tr><td colspan="4" class="muted">Пока нет ответов</td></tr>';
+
+  const maxDay = Math.max(1, ...data.daily.map(d => d.count));
+  document.getElementById('daily').innerHTML = data.daily.length
+    ? data.daily.map(d => `<div style="margin-bottom:8px"><div class="row" style="justify-content:space-between"><span>${d.day}</span><b>${d.count}</b></div><div class="bar"><i style="width:${(d.count/maxDay)*100}%"></i></div></div>`).join('')
+    : '<p class="muted">Нет данных</p>';
+
+  document.getElementById('recent').innerHTML = data.recent.map(a => {
+    const bfi = a.bfi || {};
+    const bfiTxt = ['O','C','E','A','N'].map(k => `${k}:${bfi[k]===true?'Y':bfi[k]===false?'N':'?'}`).join(' ');
+    return `<tr>
+      <td>${new Date(a.createdAt).toLocaleString('ru-RU')}</td>
+      <td>${a.heroNameRu}<div class="muted">${a.bookTitleRu}</div></td>
+      <td><span class="pill ${a.guess}">${GUESS[a.guess]||a.guess}</span></td>
+      <td class="muted">${bfiTxt}</td>
+      <td class="muted">${a.respondentId.slice(0,8)}…</td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="5" class="muted">Пока нет ответов</td></tr>';
+}
+
+boot();
+async function boot() {
+  const me = await api('/me');
+  if (me.ok) await loadStats();
+  else showLogin();
+}
+</script>
+</body>
+</html>
