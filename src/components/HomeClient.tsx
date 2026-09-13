@@ -13,14 +13,33 @@ import { apiUrl } from "@/lib/base-path";
 
 type MeStatus = "new" | "in_progress" | "completed";
 
+export type BootstrapPayload = {
+  status: MeStatus;
+  needsCookie: boolean;
+  completedAt: string | null;
+  books: ApiBook[];
+  progress: {
+    guesses: Record<string, GumilevGroup>;
+    bfiAnswers: Record<string, BfiAnswers>;
+  };
+};
+
 const LOCALE_KEY = "passion_locale";
 
-export function HomeClient() {
+export function HomeClient({ bootstrap }: { bootstrap: BootstrapPayload }) {
   const [locale, setLocale] = useState<Locale>("ru");
-  const [status, setStatus] = useState<MeStatus | null>(null);
-  const [books, setBooks] = useState<ApiBook[]>([]);
-  const [initialProgress, setInitialProgress] = useState<InitialProgress | undefined>();
-  const [error, setError] = useState("");
+  const [status, setStatus] = useState<MeStatus>(
+    bootstrap.status === "new" ? "in_progress" : bootstrap.status,
+  );
+  const [books] = useState<ApiBook[]>(bootstrap.books);
+  const [initialProgress, setInitialProgress] = useState<InitialProgress | undefined>(
+    Object.keys(bootstrap.progress.guesses).length > 0
+      ? {
+          guesses: bootstrap.progress.guesses,
+          bfiAnswers: bootstrap.progress.bfiAnswers,
+        }
+      : undefined,
+  );
 
   useEffect(() => {
     const saved = localStorage.getItem(LOCALE_KEY) as Locale | null;
@@ -32,55 +51,47 @@ export function HomeClient() {
     document.documentElement.lang = locale;
   }, [locale]);
 
+  // Ensure anonymous cookie exists without blocking first paint.
   useEffect(() => {
+    if (!bootstrap.needsCookie && status === "completed") return;
     let cancelled = false;
     (async () => {
       try {
-        const [meRes, booksRes] = await Promise.all([
-          fetch(apiUrl("/api/me")),
-          fetch(apiUrl("/api/books")),
-        ]);
-        if (!meRes.ok || !booksRes.ok) throw new Error("Failed to load");
-        const me = (await meRes.json()) as {
+        const res = await fetch(apiUrl("/api/me"), { cache: "no-store" });
+        if (!res.ok || cancelled) return;
+        const me = (await res.json()) as {
           status: MeStatus;
           progress?: {
             guesses: Record<string, GumilevGroup>;
             bfiAnswers: Record<string, BfiAnswers>;
           };
         };
-        const booksData = (await booksRes.json()) as { books: ApiBook[] };
         if (cancelled) return;
-        setStatus(me.status === "new" ? "in_progress" : me.status);
-        setBooks(booksData.books);
-        if (me.progress) {
+        if (me.status === "completed") {
+          setStatus("completed");
+          return;
+        }
+        if (me.progress && Object.keys(me.progress.guesses || {}).length > 0) {
           setInitialProgress({
             guesses: me.progress.guesses || {},
             bfiAnswers: me.progress.bfiAnswers || {},
           });
         }
       } catch {
-        if (!cancelled) setError(translations[locale].error);
+        // Non-blocking: quiz UI is already visible from SSR books.
       }
     })();
     return () => {
       cancelled = true;
     };
-  }, [locale]);
+  }, [bootstrap.needsCookie, status]);
 
-  if (error) {
+  if (!books.length) {
     return (
       <div className="app">
         <div className="already-card">
-          <p className="interest-msg error">{error}</p>
+          <p className="interest-msg error">{translations[locale].error}</p>
         </div>
-      </div>
-    );
-  }
-
-  if (!status) {
-    return (
-      <div className="app">
-        <div className="empty">{translations[locale].loading}</div>
       </div>
     );
   }

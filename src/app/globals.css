@@ -23,8 +23,12 @@ body {
 .brand { text-align: left; flex: 1; }
 .brand h1 {
   font-size: 1.75rem; font-weight: 700; letter-spacing: -0.5px;
+  color: #cfe2f5;
   background: linear-gradient(90deg, #9fd0ff, #e2c98a);
-  -webkit-background-clip: text; background-clip: text; color: transparent;
+  -webkit-background-clip: text; background-clip: text;
+}
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .brand h1 { color: transparent; }
 }
 .brand p { font-size: 0.85rem; opacity: 0.55; margin-top: 6px; }
 
@@ -155,10 +159,13 @@ body {
 .modal-card h2 {
   font-size: 1.25rem;
   margin-bottom: 10px;
+  color: #cfe2f5;
   background: linear-gradient(90deg, #9fd0ff, #e2c98a);
   -webkit-background-clip: text;
   background-clip: text;
-  color: transparent;
+}
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .modal-card h2 { color: transparent; }
 }
 .modal-card p {
   opacity: 0.75;
@@ -430,8 +437,12 @@ body {
 .already-card h1 {
   font-size: 1.6rem;
   margin-bottom: 12px;
+  color: #cfe2f5;
   background: linear-gradient(90deg, #9fd0ff, #e2c98a);
-  -webkit-background-clip: text; background-clip: text; color: transparent;
+  -webkit-background-clip: text; background-clip: text;
+}
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .already-card h1 { color: transparent; }
 }
 .already-card p { opacity: 0.7; line-height: 1.5; margin-bottom: 22px; }
 .interest-form {

@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Пассионарный тест · BFI · 3 книги</title>
+<style>
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: radial-gradient(circle at 20% 10%, #142b42 0%, #081420 60%, #03080f 100%);
+    min-height: 100vh;
+    font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+    color: #e6f0fa;
+    padding: 24px 16px 60px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .app { max-width: 1180px; width: 100%; }
+
+  /* ---------- HEADER ---------- */
+  .brand { text-align: center; margin-bottom: 26px; }
+  .brand h1 {
+    font-size: 1.75rem; font-weight: 700; letter-spacing: -0.5px;
+    background: linear-gradient(90deg, #9fd0ff, #e2c98a);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .brand p { font-size: 0.85rem; opacity: 0.55; margin-top: 6px; }
+
+  /* ---------- BOOK TABS ---------- */
+  .book-tabs {
+    display: flex; justify-content: center; flex-wrap: wrap; gap: 10px;
+    margin-bottom: 20px;
+  }
+  .book-tabs button {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: #cfe2f5; padding: 11px 22px; border-radius: 60px;
+    font-size: 0.88rem; font-weight: 600; cursor: pointer;
+    transition: 0.2s;
+  }
+  .book-tabs button:hover { background: rgba(255,255,255,0.14); }
+  .book-tabs button.active {
+    background: linear-gradient(135deg, #2e6ea6, #3f8ed0);
+    border-color: #7bb3f0; color: #fff;
+    box-shadow: 0 0 22px rgba(63,142,208,0.45);
+  }
+
+  /* ---------- PROGRESS ---------- */
+  .progress-bar {
+    max-width: 520px; margin: 0 auto 22px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 40px;
+    height: 32px;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3f8ed0, #5fc1b0);
+    transition: width 0.35s ease;
+    border-radius: 40px;
+  }
+  .progress-label {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem; font-weight: 600; color: #f0f7ff;
+    letter-spacing: 0.4px;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+  }
+
+  /* ---------- HERO GRID ---------- */
+  .hero-grid {
+    display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
+    margin-bottom: 26px;
+  }
+  .hero-chip {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.13);
+    color: #cfe2f5; padding: 9px 18px; border-radius: 40px;
+    font-size: 0.85rem; cursor: pointer; transition: 0.18s;
+    font-weight: 500;
+  }
+  .hero-chip:hover { background: rgba(255,255,255,0.13); transform: translateY(-1px); }
+  .hero-chip.active {
+    background: linear-gradient(135deg, #3f8ed0, #5fa8e8);
+    border-color: #9ecbf0; color: #fff;
+    box-shadow: 0 0 16px rgba(63,142,208,0.5);
+  }
+  .hero-chip.done {
+    border-color: #5fc1b0;
+    background: rgba(95,193,176,0.15);
+  }
+
+  /* ---------- WORKSPACE ---------- */
+  .workspace {
+    background: rgba(255,255,255,0.055);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 32px;
+    padding: 30px 28px;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 20px 45px rgba(0,0,0,0.5);
+    animation: fadeIn 0.35s ease;
+  }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(8px);} to {opacity:1; transform:none;} }
+
+  .hero-title {
+    font-size: 2rem; font-weight: 700; letter-spacing: -0.6px;
+    text-align: center;
+  }
+  .hero-subtitle {
+    font-size: 0.9rem; color: #9dc0e0; text-align: center; margin-top: 6px;
+  }
+
+  .question {
+    font-size: 1.05rem; text-align: center; margin: 26px 0 18px;
+    color: #cfe0f0;
+  }
+
+  /* ---------- TYPE INFO (Гумилёв) ---------- */
+  .types-block {
+    margin: 26px 0 10px;
+    padding: 20px 18px;
+    background: rgba(63,142,208,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 22px;
+  }
+  .types-block > h3 {
+    font-size: 1.1rem; font-weight: 700; color: #e2c98a;
+    text-align: center; margin-bottom: 4px;
+  }
+  .types-block > p.sub {
+    font-size: 0.78rem; opacity: 0.6; text-align: center; margin-bottom: 16px;
+  }
+  .type-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 14px;
+  }
+  .type-card {
+    background: rgba(255,255,255,0.045);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 18px;
+    padding: 16px 18px;
+    font-size: 0.86rem;
+    line-height: 1.55;
+    color: #cfe0f0;
+  }
+  .type-card b {
+    color: #fff; display: block; margin-bottom: 8px; font-size: 0.98rem;
+  }
+  .type-card .ex {
+    display: block; margin-top: 10px; font-size: 0.82rem;
+    color: #e2c98a; font-style: italic;
+    border-top: 1px dashed rgba(255,255,255,0.12); padding-top: 8px;
+  }
+
+  /* ---------- BFI SCALE CARDS ---------- */
+  .bfi-scales {
+    margin: 24px 0 10px;
+  }
+  .bfi-scales > h3 {
+    font-size: 1.05rem; font-weight: 600; color: #e2c98a;
+    text-align: center; margin-bottom: 4px;
+  }
+  .bfi-scales > p.sub {
+    font-size: 0.78rem; opacity: 0.6; text-align: center; margin-bottom: 18px;
+  }
+  .bfi-scale-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+  .bfi-scale-card {
+    background: linear-gradient(135deg, rgba(63,142,208,0.1), rgba(95,193,176,0.07));
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 14px 16px;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    color: #c5d8ec;
+  }
+  .bfi-scale-card h4 {
+    color: #9fd0ff; font-size: 0.9rem; margin-bottom: 8px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .bfi-scale-card .range {
+    display: flex; justify-content: space-between;
+    font-size: 0.68rem; color: #8fa8c0; margin: 6px 0 8px;
+    border-bottom: 1px dashed rgba(255,255,255,0.08); padding-bottom: 6px;
+  }
+  .bfi-scale-card .pole { margin-bottom: 5px; }
+  .bfi-scale-card .pole b { color: #fff; }
+
+  /* ---------- CHOICE ---------- */
+  .choice-row {
+    display: flex; justify-content: center; flex-wrap: wrap; gap: 14px;
+    margin-bottom: 8px;
+  }
+  .choice-btn {
+    min-width: 200px;
+    padding: 16px 26px;
+    border-radius: 18px;
+    font-size: 0.95rem; font-weight: 600;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: 0.2s;
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+  }
+  .choice-btn .hint { font-size: 0.72rem; font-weight: 400; opacity: 0.75; }
+
+  .choice-btn[data-group="passi"] {
+    background: rgba(241,178,74,0.12);
+    border-color: rgba(241,178,74,0.5);
+    color: #f7cd84;
+  }
+  .choice-btn[data-group="passi"]:hover { background: rgba(241,178,74,0.28); }
+
+  .choice-btn[data-group="garm"] {
+    background: rgba(95,193,176,0.12);
+    border-color: rgba(95,193,176,0.5);
+    color: #8fdccf;
+  }
+  .choice-btn[data-group="garm"]:hover { background: rgba(95,193,176,0.28); }
+
+  .choice-btn[data-group="sub"] {
+    background: rgba(176,124,158,0.12);
+    border-color: rgba(176,124,158,0.5);
+    color: #d6a8c4;
+  }
+  .choice-btn[data-group="sub"]:hover { background: rgba(176,124,158,0.28); }
+
+  .choice-btn.picked {
+    box-shadow: 0 0 0 2px #fff inset, 0 0 20px rgba(255,255,255,0.25);
+    transform: scale(1.03);
+  }
+
+  /* ---------- BFI YES/NO ---------- */
+  .bfi-block {
+    margin-top: 26px;
+    padding-top: 22px;
+    border-top: 1px dashed rgba(255,255,255,0.14);
+  }
+  .bfi-block h3 {
+    font-size: 1rem; font-weight: 600; color: #e2c98a;
+    margin-bottom: 4px; text-align: center;
+  }
+  .bfi-block .bfi-note {
+    font-size: 0.78rem; opacity: 0.6; text-align: center; margin-bottom: 16px;
+  }
+  .bfi-row {
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 14px;
+    padding: 10px 14px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.035);
+    margin-bottom: 8px;
+    font-size: 0.88rem;
+  }
+  .bfi-row .bfi-label { color: #d9e8f7; }
+  .bfi-row .bfi-label small { display:block; opacity: 0.6; font-size: 0.72rem; margin-top: 3px; }
+  .bfi-actions { display: flex; gap: 8px; }
+  .bfi-btn {
+    padding: 7px 16px; border-radius: 30px; cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.05);
+    color: #cfe2f5; font-size: 0.8rem; font-weight: 600;
+    transition: 0.18s;
+  }
+  .bfi-btn:hover { background: rgba(255,255,255,0.13); }
+  .bfi-btn.yes.on { background: linear-gradient(135deg, #3f8ed0, #5fa8e8); border-color:#9ecbf0; color:#fff; box-shadow:0 0 14px rgba(63,142,208,0.5); }
+  .bfi-btn.no.on  { background: linear-gradient(135deg, #a05a7a, #c97a9a); border-color:#e0a8c0; color:#fff; box-shadow:0 0 14px rgba(200,120,150,0.5); }
+
+  /* ---------- VERDICT ---------- */
+  .verdict {
+    padding: 16px 20px;
+    border-radius: 18px;
+    font-size: 0.95rem; line-height: 1.55;
+    margin-top: 22px;
+    background: rgba(63,142,208,0.12);
+    border-left: 4px solid #3f8ed0;
+    color: #cfe0f0;
+  }
+  .verdict b { color: #fff; }
+  .verdict.warn {
+    background: rgba(241,178,74,0.1);
+    border-left-color: #f1b24a;
+  }
+
+  /* ---------- BOTTOM ACTION ---------- */
+  .bottom-action {
+    margin-top: 26px;
+    text-align: center;
+  }
+  .reveal-btn {
+    padding: 15px 34px;
+    border-radius: 40px;
+    font-size: 0.95rem; font-weight: 700;
+    cursor: pointer;
+    border: 1px dashed rgba(155,205,255,0.5);
+    background: rgba(63,142,208,0.12);
+    color: #bcdcff;
+    transition: 0.2s;
+    letter-spacing: 0.3px;
+  }
+  .reveal-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    border-style: solid;
+  }
+  .reveal-btn:not(:disabled):hover {
+    background: rgba(63,142,208,0.25);
+    transform: scale(1.02);
+  }
+
+  /* ---------- AI REVEAL SECTION ---------- */
+  .ai-section {
+    margin-top: 30px;
+    display: none;
+    animation: fadeIn 0.5s ease;
+  }
+  .ai-section.open { display: block; }
+
+  .ai-section h2 {
+    text-align: center;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #e2c98a;
+    margin-bottom: 6px;
+    letter-spacing: -0.3px;
+  }
+  .ai-section p.note {
+    text-align: center;
+    font-size: 0.82rem;
+    opacity: 0.6;
+    margin-bottom: 22px;
+  }
+
+  .ai-card {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 22px;
+    margin-bottom: 12px;
+    overflow: hidden;
+    transition: 0.2s;
+  }
+  .ai-card-head {
+    padding: 16px 22px;
+    display: flex; justify-content: space-between; align-items: center;
+    cursor: pointer;
+    gap: 14px;
+  }
+  .ai-card-head:hover { background: rgba(255,255,255,0.04); }
+  .ai-card-name { font-weight: 600; font-size: 0.98rem; }
+  .ai-card-tag {
+    font-size: 0.75rem; padding: 4px 12px; border-radius: 30px;
+    font-weight: 600; white-space: nowrap;
+  }
+  .ai-card-tag.passi { background: rgba(241,178,74,0.2); color: #f7cd84; }
+  .ai-card-tag.garm  { background: rgba(95,193,176,0.2); color: #8fdccf; }
+  .ai-card-tag.sub   { background: rgba(176,124,158,0.2); color: #d6a8c4; }
+
+  .ai-card-toggle {
+    font-size: 0.8rem; opacity: 0.5; transition: transform 0.25s;
+  }
+  .ai-card-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+    padding: 0 22px;
+  }
+  .ai-card.expanded .ai-card-body {
+    max-height: 900px;
+    padding: 0 22px 22px;
+  }
+  .ai-card.expanded .ai-card-toggle { transform: rotate(180deg); }
+
+  .ai-card-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.1fr;
+    gap: 22px;
+    align-items: center;
+    margin-top: 10px;
+  }
+  @media (max-width: 760px) { .ai-card-grid { grid-template-columns: 1fr; } }
+
+  .ai-axis-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 4px 20px;
+    font-size: 0.82rem;
+  }
+  .ai-axis-row {
+    display: flex; justify-content: space-between;
+    padding: 4px 0; border-bottom: 1px dashed rgba(255,255,255,0.07);
+  }
+  .ai-axis-row b { font-variant-numeric: tabular-nums; }
+
+  .ai-desc {
+    font-size: 0.88rem; line-height: 1.55; color: #bcd0e4;
+    border-left: 3px solid #3f8ed0; padding-left: 12px;
+    margin-bottom: 12px;
+  }
+
+  .ai-pole {
+    font-size: 0.78rem; color: #9dc0e0; margin-top: 10px; line-height: 1.5;
+    background: rgba(255,255,255,0.03);
+    padding: 8px 10px; border-radius: 10px;
+  }
+  .ai-pole b { color: #e2c98a; }
+
+  canvas.radar-mini {
+    width: 100%; max-width: 400px; aspect-ratio: 1/1; height: auto;
+    display: block; margin: 0 auto;
+  }
+
+  .empty {
+    text-align: center; padding: 40px 20px; opacity: 0.45;
+    font-size: 0.95rem;
+  }
+
+  .footer {
+    text-align: center; margin-top: 30px;
+    font-size: 0.75rem; opacity: 0.4; letter-spacing: 0.4px;
+  }
+
+
+  .topbar { display:flex; justify-content:flex-end; gap:8px; margin-bottom:8px; }
+  .lang-btn {
+    border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.05);
+    color:#cfe2f5; padding:8px 14px; border-radius:999px; cursor:pointer; font-weight:700;
+  }
+  .lang-btn.active { background:linear-gradient(135deg,#2e6ea6,#3f8ed0); border-color:#7bb3f0; color:#fff; }
+  .brand h1 {
+    background: linear-gradient(90deg, #9fd0ff, #e2c98a);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .hero-chip.done::after { content: ' ✓'; color:#8fdccf; }
+  .locked-note { text-align:center; color:#8fdccf; margin:10px 0 0; font-size:.9rem; }
+  .save-row { text-align:center; margin-top:18px; }
+  .save-btn {
+    padding:14px 30px; border:0; border-radius:40px; cursor:pointer; font-weight:700;
+    color:#fff; background:linear-gradient(135deg,#2f8a74,#5fc1b0);
+    box-shadow:0 0 18px rgba(95,193,176,.35);
+  }
+  .save-btn:disabled { opacity:.45; cursor:not-allowed; box-shadow:none; }
+  .backdrop {
+    position:fixed; inset:0; background:rgba(3,8,15,.78); display:flex;
+    align-items:center; justify-content:center; padding:16px; z-index:50;
+  }
+  .modal {
+    width:min(460px,100%); background:#102538; border:1px solid rgba(255,255,255,.14);
+    border-radius:20px; padding:22px;
+  }
+  .modal h2 { margin-bottom:10px; color:#cfe2f5; }
+  .modal p { opacity:.78; margin-bottom:14px; line-height:1.45; }
+  .modal ul {
+    list-style:none; max-height:200px; overflow:auto; margin:0 0 16px;
+    border:1px solid rgba(255,255,255,.1); border-radius:12px;
+  }
+  .modal li {
+    padding:10px 12px; border-bottom:1px solid rgba(255,255,255,.06);
+    display:flex; justify-content:space-between; gap:8px; font-size:.9rem;
+  }
+  .modal .btns { display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap; }
+  .ghost {
+    border:1px solid rgba(255,255,255,.14); border-radius:999px; padding:12px 20px;
+    background:rgba(255,255,255,.08); color:#fff; cursor:pointer;
+  }
+  .primary {
+    border:0; border-radius:999px; padding:12px 20px; font-weight:700; cursor:pointer;
+    color:#fff; background:linear-gradient(135deg,#2f8a74,#5fc1b0);
+  }
+  .err { color:#f0b0b0; text-align:center; margin:10px 0; }
+  .center { text-align:center; opacity:.7; padding:40px 20px; }
+  .done-screen {
+    max-width:560px; margin:60px auto; text-align:center;
+    background:rgba(255,255,255,.055); border:1px solid rgba(255,255,255,.1);
+    border-radius:32px; padding:30px 28px;
+  }
+  .done-screen input {
+    min-width:220px; padding:12px 14px; border-radius:999px;
+    border:1px solid rgba(255,255,255,.18); background:rgba(0,0,0,.25); color:#fff;
+  }
+  button:disabled { opacity:.45; cursor:not-allowed; }
+
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <div class="center">Загрузка…</div>
+</div>
+<script>
+
+const API = '/passion/api';
+const AXES = {
+  ru: ['Открытость','Добросовестность','Экстраверсия','Доброжелательность','Нейротизм'],
+  en: ['Openness','Conscientiousness','Extraversion','Agreeableness','Neuroticism']
+};
+const BFI_SCALES = {
+  ru: [
+    {id:'O', label:'🔵 Открытость опыту (O)', low:'0–33', mid:'34–66', high:'67–100',
+      highDesc:'Любопытство, креативность, интерес к новому, артистичность, готовность к изменениям.',
+      lowDesc:'Практичность, традиционность, предпочтение рутины, консерватизм.'},
+    {id:'C', label:'🟢 Добросовестность (C)', low:'0–33', mid:'34–66', high:'67–100',
+      highDesc:'Организованность, самодисциплина, надёжность, стремление к достижениям, планирование.',
+      lowDesc:'Спонтанность, гибкость, неорганизованность, прокрастинация.'},
+    {id:'E', label:'🟡 Экстраверсия (E)', low:'0–33', mid:'34–66', high:'67–100',
+      highDesc:'Общительность, энергичность, уверенность в себе, стремление к лидерству, позитивные эмоции.',
+      lowDesc:'Сдержанность, независимость, предпочтение уединения, глубина отношений.'},
+    {id:'A', label:'🟣 Доброжелательность (A)', low:'0–33', mid:'34–66', high:'67–100',
+      highDesc:'Доверие, альтруизм, кооперативность, эмпатия, скромность.',
+      lowDesc:'Критичность, конкурентность, скептицизм, готовность к конфликтам, независимость в суждениях.'},
+    {id:'N', label:'🔴 Нейротизм (N)', low:'0–33', mid:'34–66', high:'67–100',
+      highDesc:'Тревожность, эмоциональная нестабильность, уязвимость к стрессу, частые негативные эмоции.',
+      lowDesc:'Спокойствие, уверенность, устойчивость к стрессу, оптимизм (эмоциональная устойчивость).'}
+  ],
+  en: [
+    {id:'O', label:'🔵 Openness (O)', low:'0–33', mid:'34–66', high:'67–100',
+      highDesc:'Curiosity, creativity, interest in novelty, artistic sensibility, readiness for change.',
+      lowDesc:'Practicality, traditionalism, preference for routine, conservatism.'},
+    {id:'C', label:'🟢 Conscientiousness (C)', low:'0–33', mid:'34–66', high:'67–100',
+      highDesc:'Organization, self-discipline, reliability, achievement drive, planning.',
+      lowDesc:'Spontaneity, flexibility, disorganization, procrastination.'},
+    {id:'E', label:'🟡 Extraversion (E)', low:'0–33', mid:'34–66', high:'67–100',
+      highDesc:'Sociability, energy, self-confidence, leadership drive, positive affect.',
+      lowDesc:'Reserve, independence, preference for solitude, depth over breadth.'},
+    {id:'A', label:'🟣 Agreeableness (A)', low:'0–33', mid:'34–66', high:'67–100',
+      highDesc:'Trust, altruism, cooperation, empathy, modesty.',
+      lowDesc:'Critical stance, competitiveness, skepticism, readiness for conflict.'},
+    {id:'N', label:'🔴 Neuroticism (N)', low:'0–33', mid:'34–66', high:'67–100',
+      highDesc:'Anxiety, emotional instability, stress vulnerability, frequent negative emotions.',
+      lowDesc:'Calmness, confidence, stress resilience, optimism (emotional stability).'}
+  ]
+};
+const BFI_QUESTIONS = {
+  ru: [
+    {id:'O', label:'Открытость опыту', hint:'любознательность, воображение, интерес к новому'},
+    {id:'C', label:'Добросовестность', hint:'организованность, дисциплина, надёжность'},
+    {id:'E', label:'Экстраверсия', hint:'общительность, активность, энергия'},
+    {id:'A', label:'Доброжелательность', hint:'альтруизм, доверие, готовность помочь'},
+    {id:'N', label:'Нейротизм', hint:'тревожность, ранимость, эмоциональная нестабильность'}
+  ],
+  en: [
+    {id:'O', label:'Openness', hint:'curiosity, imagination, interest in novelty'},
+    {id:'C', label:'Conscientiousness', hint:'organization, discipline, reliability'},
+    {id:'E', label:'Extraversion', hint:'sociability, activity, energy'},
+    {id:'A', label:'Agreeableness', hint:'altruism, trust, willingness to help'},
+    {id:'N', label:'Neuroticism', hint:'anxiety, sensitivity, emotional instability'}
+  ]
+};
+const GROUP_META = {
+  ru: {
+    passi: {label:'Пассионарий', emoji:'⚡', hint:'избыток энергии, сверхцель, ломка границ',
+      full:'Люди с избытком «пассионарной энергии»: они ставят сверхцель выше самосохранения, ломают нормы и часто меняют ход истории — ценой своей жизни и жизней окружающих. Импульс пассионарности может быть творческим или разрушительным.',
+      ex:'Примеры: Александр Македонский, Юлий Цезарь, Наполеон, Пётр I, Жанна д’Арк.'},
+    garm: {label:'Гармоничный (персистент)', emoji:'🌿', hint:'баланс энергии, основа социума',
+      full:'Люди с нормальным, сбалансированным уровнем энергии. Они не рвутся к сверхцели, но и не лишены воли: добросовестны, ценят семью и традицию, создают блага и удерживают социальную ткань.',
+      ex:'Примеры: Марк Аврелий, Эразм Роттердамский, В. А. Жуковский.'},
+    sub: {label:'Субпассионарий', emoji:'🔍', hint:'дефицит энергии, ведомость, инерция',
+      full:'Люди с пониженной энергетикой: не способны к длительному усилию, легко подчиняются более сильным, живут чужими идеями или прошлым. Могут быть умны и талантливы, но без внутреннего мотора для действия.',
+      ex:'Примеры: Николай II в конце правления, Обломов, «лишние люди» русской литературы.'}
+  },
+  en: {
+    passi: {label:'Passionary', emoji:'⚡', hint:'surplus energy, super-goal, breaking norms',
+      full:'People with surplus “passionary energy”: they put a super-goal above self-preservation, break norms, and often change history — at a personal and social cost. The impulse can be creative or destructive.',
+      ex:'Examples: Alexander the Great, Julius Caesar, Napoleon, Peter I, Joan of Arc.'},
+    garm: {label:'Harmonic (persistent)', emoji:'🌿', hint:'balanced energy, social fabric',
+      full:'People with a balanced energy level. They do not chase a super-goal, yet are not will-less: conscientious, oriented to family and tradition, they sustain everyday social life.',
+      ex:'Examples: Marcus Aurelius, Erasmus of Rotterdam, V. A. Zhukovsky.'},
+    sub: {label:'Subpassionary', emoji:'🔍', hint:'energy deficit, inertia, being led',
+      full:'People with lowered energy: limited capacity for sustained effort, easily led by stronger wills, living by others’ ideas or the past. They may be intelligent, yet lack an inner drive to act.',
+      ex:'Examples: late Nicholas II, Oblomov, “superfluous people” in Russian literature.'}
+  }
+};
+const I18N = {
+  ru: {
+    title:'🧭 Пассионарный тест героев · Big Five',
+    subtitle:'Оцените тип героя по Гумилёву, отметьте признаки BFI — и сравните с оценкой ИИ.',
+    pick:'Выберите героя, чтобы оценить его',
+    step1:'🤔 Шаг 1. К какому типу по Гумилёву вы отнесёте этого героя?',
+    step2:'🧠 Шаг 2. Какими признаками BFI, по вашему мнению, обладает герой?',
+    step2note:'Отметьте «Да» или «Нет» по каждой из пяти шкал.',
+    typesTitle:'Типология по Гумилёву',
+    typesSub:'Краткие ориентиры перед выбором',
+    bfiTitle:'Шкалы Big Five Inventory',
+    bfiSub:'Что означают высокие и низкие значения',
+    yes:'Да', no:'Нет',
+    ready:'✅ Готово. Можно сохранить ответ или дождаться оценки ИИ по всей книге.',
+    left:'⚠️ Осталось ответить на BFI-вопросы: {n} из 5.',
+    save:'Сохранить ответ',
+    locked:'Ответ по этому герою уже сохранён',
+    confirmTitle:'Сохранить ответ?',
+    confirmBody:'Ответ будет записан в базу. Изменить его потом нельзя.',
+    cancel:'Отмена',
+    savedTitle:'Ответ сохранён',
+    savedBody:'Вы уже ответили по следующим героям:',
+    cont:'Продолжить',
+    revealLock:'🔒 Показать оценку ИИ по BFI (осталось {n})',
+    revealShow:'🔓 Показать оценку ИИ по BFI',
+    revealHide:'🙈 Скрыть оценку ИИ по BFI',
+    aiTitle:'📊 Оценка ИИ по Big Five Inventory · {book}',
+    aiNote:'Нажмите на карточку, чтобы раскрыть радар, числовые значения и пояснение полюсов.',
+    yourChoice:' · ваш выбор: ',
+    matched:' · совпало ✓',
+    profile:'Профиль:',
+    high:'выражены —',
+    low:'снижены —',
+    already:'Вы уже отвечали',
+    alreadyBody:'Если вас интересует судьба проекта, оставьте e-mail.',
+    emailSend:'Свяжитесь со мной',
+    emailOk:'Спасибо! Мы свяжемся с вами.',
+    err:'Ошибка загрузки. Обновите страницу.',
+    footer:'Митчелл · Скотт · Толстой — Big Five Inventory + типология Гумилёва',
+    loading:'Загрузка…'
+  },
+  en: {
+    title:'🧭 Passionary hero quiz · Big Five',
+    subtitle:'Rate the Gumilev type, mark BFI traits — then compare with the AI estimate.',
+    pick:'Pick a hero to begin',
+    step1:'🤔 Step 1. Which Gumilev type fits this hero?',
+    step2:'🧠 Step 2. Which BFI traits does this hero show?',
+    step2note:'Mark Yes or No for each of the five scales.',
+    typesTitle:'Gumilev typology',
+    typesSub:'Short guides before you choose',
+    bfiTitle:'Big Five Inventory scales',
+    bfiSub:'What high and low scores mean',
+    yes:'Yes', no:'No',
+    ready:'✅ Done. You can save the answer or wait for the book-level AI reveal.',
+    left:'⚠️ BFI answers left: {n} of 5.',
+    save:'Save answer',
+    locked:'This hero answer is already saved',
+    confirmTitle:'Save this answer?',
+    confirmBody:'It will be written to the database and cannot be changed later.',
+    cancel:'Cancel',
+    savedTitle:'Answer saved',
+    savedBody:'You already answered these heroes:',
+    cont:'Continue',
+    revealLock:'🔒 Show AI BFI estimate ({n} left)',
+    revealShow:'🔓 Show AI BFI estimate',
+    revealHide:'🙈 Hide AI BFI estimate',
+    aiTitle:'📊 AI Big Five estimate · {book}',
+    aiNote:'Tap a card to expand the radar, numeric scores, and pole notes.',
+    yourChoice:' · your pick: ',
+    matched:' · match ✓',
+    profile:'Profile:',
+    high:'elevated —',
+    low:'reduced —',
+    already:'You already answered',
+    alreadyBody:'If you care about the project, leave your e-mail.',
+    emailSend:'Contact me',
+    emailOk:'Thanks! We will contact you.',
+    err:'Load error. Refresh the page.',
+    footer:'Mitchell · Scott · Tolstoy — Big Five Inventory + Gumilev typology',
+    loading:'Loading…'
+  }
+};
+
+let locale = localStorage.getItem('passion_locale') === 'en' ? 'en' : 'ru';
+let books = [];
+let status = 'in_progress';
+let progress = {guesses:{}, bfi:{}};
+let saved = new Set();
+let bookIdx = 0, heroIdx = -1;
+let aiRevealed = {};
+let modal = null, pending = null;
+
+const t = () => I18N[locale];
+const gm = () => GROUP_META[locale];
+const key = (slug, id) => `${slug}:${id}`;
+const heroName = (h) => locale === 'ru' ? h.nameRu : h.nameEn;
+const bookTitle = (b) => locale === 'ru' ? b.titleRu : b.titleEn;
+const heroDesc = (h) => locale === 'ru' ? h.descRu : h.descEn;
+const isDone = (slug, id) => {
+  const k = key(slug, id);
+  const g = progress.guesses[k];
+  const b = progress.bfi[k] || {};
+  return !!(g && ['O','C','E','A','N'].every(a => typeof b[a] === 'boolean'));
+};
+const bookDoneCount = (book) => book.heroes.filter(h => isDone(book.slug, h.id) || saved.has(key(book.slug, h.id))).length;
+
+async function boot() {
+  document.getElementById('app').innerHTML = `<div class="center">${t().loading}</div>`;
+  try {
+    const [meRes, booksRes] = await Promise.all([
+      fetch(API + '/me', {credentials:'same-origin', cache:'no-store'}),
+      fetch(API + '/books', {credentials:'same-origin', cache:'no-store'})
+    ]);
+    if (!meRes.ok || !booksRes.ok) throw new Error('bad');
+    const me = await meRes.json();
+    books = (await booksRes.json()).books || [];
+    status = me.status === 'completed' ? 'completed' : 'in_progress';
+    if (me.progress) {
+      progress.guesses = me.progress.guesses || {};
+      progress.bfi = me.progress.bfiAnswers || {};
+      (me.progress.answers || []).forEach(a => saved.add(key(a.bookSlug, a.heroId)));
+      Object.keys(progress.guesses).forEach(k => {
+        const i = k.indexOf(':');
+        if (i < 0) return;
+        if (isDone(k.slice(0,i), k.slice(i+1))) saved.add(k);
+      });
+    }
+    render();
+  } catch (e) {
+    document.getElementById('app').innerHTML = `<div class="err">${t().err}</div>`;
+  }
+}
+
+function answeredList() {
+  const out = [];
+  books.forEach(b => b.heroes.forEach(h => {
+    if (saved.has(key(b.slug, h.id))) out.push({hero: heroName(h), book: bookTitle(b)});
+  }));
+  return out;
+}
+
+function render() {
+  const app = document.getElementById('app');
+  if (status === 'completed') {
+    app.innerHTML = `
+      <div class="done-screen">
+        <h1>${t().already}</h1>
+        <p style="opacity:.7;margin:12px 0 18px">${t().alreadyBody}</p>
+        <form id="emailForm" style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+          <input id="email" type="email" required placeholder="you@example.com" />
+          <button class="primary" type="submit">${t().emailSend}</button>
+        </form>
+        <p id="emailMsg" class="center" style="padding:12px 0 0"></p>
+        ${langHtml()}
+      </div>`;
+    bindLang();
+    document.getElementById('emailForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const res = await fetch(API + '/interest', {
+        method:'POST', credentials:'same-origin',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({email})
+      });
+      document.getElementById('emailMsg').textContent = res.ok ? t().emailOk : t().err;
+    };
+    return;
+  }
+
+  const book = books[bookIdx];
+  if (!book) { app.innerHTML = `<div class="err">${t().err}</div>`; return; }
+  const done = bookDoneCount(book);
+  const pct = book.heroes.length ? (done / book.heroes.length) * 100 : 0;
+
+  app.innerHTML = `
+    <div class="topbar">${langHtml()}</div>
+    <div class="brand"><h1>${t().title}</h1><p>${t().subtitle}</p></div>
+    <div class="book-tabs" id="bookTabs">
+      ${books.map((b,i)=>`<button type="button" data-book="${i}" class="${i===bookIdx?'active':''}">${bookTitle(b)}</button>`).join('')}
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" style="width:${pct}%"></div>
+      <div class="progress-label">${done} / ${book.heroes.length}</div>
+    </div>
+    <div class="hero-grid" id="heroGrid">
+      ${book.heroes.map((h,i)=>{
+        const d = saved.has(key(book.slug,h.id)) || isDone(book.slug,h.id);
+        return `<button type="button" class="hero-chip ${i===heroIdx?'active':''} ${d?'done':''}" data-hero="${i}">${heroName(h)}</button>`;
+      }).join('')}
+    </div>
+    <div class="workspace" id="workspace"></div>
+    <div class="bottom-action" id="bottomAction"></div>
+    <div class="ai-section" id="aiSection"></div>
+    <div class="footer">${t().footer}</div>
+    <div id="modalHost"></div>`;
+
+  bindLang();
+  app.querySelectorAll('[data-book]').forEach(btn => btn.onclick = () => { bookIdx=+btn.dataset.book; heroIdx=-1; render(); });
+  app.querySelectorAll('[data-hero]').forEach(btn => btn.onclick = () => { heroIdx=+btn.dataset.hero; render(); });
+  renderWorkspace();
+  renderBottomAction();
+  renderAISection();
+  if (modal) showModal();
+}
+
+function langHtml() {
+  return `<div>
+    <button type="button" class="lang-btn ${locale==='ru'?'active':''}" data-l="ru">RU</button>
+    <button type="button" class="lang-btn ${locale==='en'?'active':''}" data-l="en">EN</button>
+  </div>`;
+}
+function bindLang() {
+  document.querySelectorAll('[data-l]').forEach(btn => btn.onclick = () => {
+    locale = btn.dataset.l;
+    localStorage.setItem('passion_locale', locale);
+    render();
+  });
+}
+
+function renderWorkspace() {
+  const ws = document.getElementById('workspace');
+  const book = books[bookIdx];
+  if (heroIdx < 0) { ws.innerHTML = `<div class="empty">${t().pick}</div>`; return; }
+  const hero = book.heroes[heroIdx];
+  const k = key(book.slug, hero.id);
+  const locked = saved.has(k);
+  const guess = progress.guesses[k];
+  const bfi = progress.bfi[k] || {};
+  const meta = gm();
+  const scales = BFI_SCALES[locale];
+  const qs = BFI_QUESTIONS[locale];
+  const bfiCount = ['O','C','E','A','N'].filter(a => typeof bfi[a]==='boolean').length;
+
+  let verdict = '';
+  if (guess && bfiCount === 5) verdict = `<div class="verdict">${t().ready}</div>`;
+  else if (guess) verdict = `<div class="verdict warn">${t().left.replace('{n}', String(5-bfiCount))}</div>`;
+
+  ws.innerHTML = `
+    <div class="hero-title">${heroName(hero)}</div>
+    <div class="hero-subtitle">${bookTitle(book)}</div>
+    ${locked ? `<p class="locked-note">${t().locked}</p>` : ''}
+    <div class="question">${t().step1}</div>
+    <div class="choice-row">
+      ${['passi','garm','sub'].map(g => `
+        <button type="button" class="choice-btn ${guess===g?'picked':''}" data-group="${g}" ${locked?'disabled':''}>
+          <span>${meta[g].emoji} ${meta[g].label}</span>
+          <span class="hint">${meta[g].hint}</span>
+        </button>`).join('')}
+    </div>
+    <div class="types-block">
+      <h3>${t().typesTitle}</h3>
+      <p class="sub">${t().typesSub}</p>
+      <div class="type-info">
+        ${['passi','garm','sub'].map(g => `
+          <div class="type-card"><b>${meta[g].emoji} ${meta[g].label}</b>${meta[g].full}<span class="ex">${meta[g].ex}</span></div>
+        `).join('')}
+      </div>
+    </div>
+    <div class="bfi-block">
+      <h3>${t().step2}</h3>
+      <p class="bfi-note">${t().step2note}</p>
+      ${qs.map(qq => `
+        <div class="bfi-row">
+          <div class="bfi-label">${qq.label}<small>${qq.hint}</small></div>
+          <div class="bfi-actions">
+            <button type="button" class="bfi-btn yes ${bfi[qq.id]===true?'on':''}" data-a="${qq.id}" data-v="1" ${locked?'disabled':''}>${t().yes}</button>
+            <button type="button" class="bfi-btn no ${bfi[qq.id]===false?'on':''}" data-a="${qq.id}" data-v="0" ${locked?'disabled':''}>${t().no}</button>
+          </div>
+        </div>`).join('')}
+    </div>
+    <div class="bfi-scales">
+      <h3>${t().bfiTitle}</h3>
+      <p class="sub">${t().bfiSub}</p>
+      <div class="bfi-scale-grid">
+        ${scales.map(s => `
+          <div class="bfi-scale-card">
+            <h4>${s.label}</h4>
+            <div class="range"><span>${s.low}</span><span>${s.mid}</span><span>${s.high}</span></div>
+            <div class="pole"><b>↑</b> ${s.highDesc}</div>
+            <div class="pole"><b>↓</b> ${s.lowDesc}</div>
+          </div>`).join('')}
+      </div>
+    </div>
+    ${verdict}
+    ${(!locked && isDone(book.slug, hero.id)) ? `<div class="save-row"><button type="button" class="save-btn" id="saveBtn">${t().save}</button></div>` : ''}
+    <p id="saveErr" class="err"></p>`;
+
+  ws.querySelectorAll('[data-group]').forEach(btn => btn.onclick = () => {
+    progress.guesses[k] = btn.dataset.group;
+    maybeAskSave();
+    render();
+  });
+  ws.querySelectorAll('[data-a]').forEach(btn => btn.onclick = () => {
+    progress.bfi[k] = {...(progress.bfi[k]||{}), [btn.dataset.a]: btn.dataset.v==='1'};
+    maybeAskSave();
+    render();
+  });
+  const saveBtn = document.getElementById('saveBtn');
+  if (saveBtn) saveBtn.onclick = () => openConfirm();
+}
+
+function renderBottomAction() {
+  const el = document.getElementById('bottomAction');
+  const book = books[bookIdx];
+  const total = book.heroes.length;
+  const done = bookDoneCount(book);
+  const allDone = done === total;
+  const revealed = !!aiRevealed[book.slug];
+  const btn = document.createElement('button');
+  btn.className = 'reveal-btn';
+  if (!allDone) {
+    btn.disabled = true;
+    btn.textContent = t().revealLock.replace('{n}', String(total - done));
+  } else if (revealed) {
+    btn.textContent = t().revealHide;
+    btn.onclick = () => { aiRevealed[book.slug] = false; render(); };
+  } else {
+    btn.textContent = t().revealShow;
+    btn.onclick = () => {
+      aiRevealed[book.slug] = true;
+      render();
+      setTimeout(() => document.getElementById('aiSection')?.scrollIntoView({behavior:'smooth', block:'start'}), 50);
+    };
+  }
+  el.appendChild(btn);
+}
+
+function renderAISection() {
+  const ai = document.getElementById('aiSection');
+  const book = books[bookIdx];
+  if (!aiRevealed[book.slug]) { ai.classList.remove('open'); ai.innerHTML=''; return; }
+  ai.classList.add('open');
+  const axes = AXES[locale];
+  const meta = gm();
+  ai.innerHTML = `
+    <h2>${t().aiTitle.replace('{book}', bookTitle(book))}</h2>
+    <p class="note">${t().aiNote}</p>`;
+  book.heroes.forEach((hero) => {
+    const k = key(book.slug, hero.id);
+    const userGuess = progress.guesses[k];
+    let userMark = '';
+    if (userGuess && userGuess !== hero.group) userMark = `${t().yourChoice}${meta[userGuess]?.emoji || ''}`;
+    else if (userGuess) userMark = t().matched;
+    const scores = Array.isArray(hero.scores) ? hero.scores : [0,0,0,0,0];
+    const g = hero.group in meta ? hero.group : 'garm';
+    const card = document.createElement('div');
+    card.className = 'ai-card';
+    card.innerHTML = `
+      <div class="ai-card-head">
+        <div class="ai-card-name">${heroName(hero)}${userMark}</div>
+        <div class="ai-card-tag ${g}">${meta[g].emoji} ${meta[g].label}</div>
+        <div class="ai-card-toggle">▼</div>
+      </div>
+      <div class="ai-card-body">
+        <div class="ai-card-grid">
+          <div>
+            <div class="ai-desc">${heroDesc(hero) || ''}</div>
+            <div class="ai-axis-list">
+              ${axes.map((axis,i) => {
+                const v = Number(scores[i]||0);
+                const color = v > 0.3 ? '#f7cd84' : v < -0.3 ? '#d6a8c4' : '#8fdccf';
+                return `<div class="ai-axis-row"><span>${axis}</span><b style="color:${color}">${v.toFixed(1)}</b></div>`;
+              }).join('')}
+            </div>
+            <div class="ai-pole" id="pole-${hero.id}"></div>
+          </div>
+          <div><canvas class="radar-mini" width="640" height="640" data-scores='${JSON.stringify(scores)}'></canvas></div>
+        </div>
+      </div>`;
+    const high=[], low=[];
+    axes.forEach((ax,i) => {
+      const v = Number(scores[i]||0);
+      if (v > 0.3) high.push(ax.toLowerCase());
+      else if (v < -0.3) low.push(ax.toLowerCase());
+    });
+    card.querySelector(`#pole-${hero.id}`).innerHTML =
+      `<b>${t().profile}</b> ${high.length?`${t().high} ${high.join(', ')}.` : ''} ${low.length?`${t().low} ${low.join(', ')}.` : ''}`;
+    card.querySelector('.ai-card-head').onclick = () => card.classList.toggle('expanded');
+    ai.appendChild(card);
+    const cnv = card.querySelector('canvas');
+    drawRadar(cnv, scores);
+  });
+}
+
+function drawRadar(canvas, scores) {
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height, cx = w/2, cy = h/2;
+  const R = Math.min(w,h) * 0.36, N = 5, step = (Math.PI*2)/N;
+  const axes = AXES[locale];
+  ctx.clearRect(0,0,w,h);
+  for (let ring=1; ring<=3; ring++){
+    const r = R * ring/3;
+    ctx.beginPath();
+    for (let i=0;i<=N;i++){
+      const a = -Math.PI/2 + i*step;
+      const x = cx + r*Math.cos(a), y = cy + r*Math.sin(a);
+      i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    }
+    ctx.closePath();
+    ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+    ctx.lineWidth = 1.2; ctx.stroke();
+  }
+  ctx.beginPath(); ctx.arc(cx, cy, R*0.5, 0, Math.PI*2);
+  ctx.strokeStyle = 'rgba(255,255,255,0.3)'; ctx.setLineDash([4,5]); ctx.lineWidth = 1.4; ctx.stroke(); ctx.setLineDash([]);
+  ctx.font = '600 14px "Segoe UI", system-ui, sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  for (let i=0;i<N;i++){
+    const a = -Math.PI/2 + i*step;
+    const x = cx + R*Math.cos(a), y = cy + R*Math.sin(a);
+    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(x, y);
+    ctx.strokeStyle = 'rgba(255,255,255,0.14)'; ctx.lineWidth = 1.3; ctx.stroke();
+    ctx.fillStyle = '#b6d0e8';
+    ctx.fillText(axes[i], cx + R*1.15*Math.cos(a), cy + R*1.15*Math.sin(a));
+  }
+  ctx.beginPath();
+  for (let i=0;i<N;i++){
+    const v = Math.max(-1, Math.min(1, Number(scores[i]||0)));
+    const r = R * ((v+1)/2);
+    const a = -Math.PI/2 + i*step;
+    const x = cx + r*Math.cos(a), y = cy + r*Math.sin(a);
+    i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+  }
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(63,142,208,0.3)'; ctx.fill();
+  ctx.strokeStyle = '#7bb3f0'; ctx.lineWidth = 3; ctx.stroke();
+  ctx.font = 'bold 12px "Segoe UI", sans-serif';
+  for (let i=0;i<N;i++){
+    const v = Math.max(-1, Math.min(1, Number(scores[i]||0)));
+    const r = R * ((v+1)/2);
+    const a = -Math.PI/2 + i*step;
+    const x = cx + r*Math.cos(a), y = cy + r*Math.sin(a);
+    ctx.beginPath(); ctx.arc(x, y, 5.5, 0, Math.PI*2);
+    ctx.fillStyle = '#eaf4ff'; ctx.shadowColor = '#7bb3f0'; ctx.shadowBlur = 10; ctx.fill(); ctx.shadowBlur = 0;
+    ctx.fillStyle = '#eaf2fa'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+    ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 6;
+    ctx.fillText(v.toFixed(1), x, y - 9); ctx.shadowBlur = 0;
+  }
+}
+
+function maybeAskSave() {
+  const book = books[bookIdx];
+  const hero = book.heroes[heroIdx];
+  if (!hero) return;
+  const k = key(book.slug, hero.id);
+  if (saved.has(k)) return;
+  if (isDone(book.slug, hero.id)) openConfirm();
+}
+function openConfirm() {
+  const book = books[bookIdx];
+  const hero = book.heroes[heroIdx];
+  pending = {bookSlug: book.slug, heroId: hero.id, heroName: heroName(hero)};
+  modal = 'confirm';
+  showModal();
+}
+function showModal() {
+  const el = document.getElementById('modalHost');
+  if (!el || !modal) { if (el) el.innerHTML=''; return; }
+  if (modal === 'confirm' && pending) {
+    el.innerHTML = `<div class="backdrop"><div class="modal">
+      <h2>${t().confirmTitle}</h2>
+      <p><b>${pending.heroName}</b><br>${t().confirmBody}</p>
+      <div class="btns">
+        <button class="ghost" id="mCancel">${t().cancel}</button>
+        <button class="primary" id="mOk">${t().save}</button>
+      </div></div></div>`;
+    document.getElementById('mCancel').onclick = () => { modal=null; pending=null; showModal(); };
+    document.getElementById('mOk').onclick = () => doSave();
+  } else if (modal === 'saved') {
+    const list = answeredList().map(x=>`<li><span>✓ ${x.hero}</span><span style="opacity:.55">${x.book}</span></li>`).join('');
+    el.innerHTML = `<div class="backdrop"><div class="modal">
+      <h2>${t().savedTitle}</h2>
+      <p>${t().savedBody}</p>
+      <ul>${list}</ul>
+      <div class="btns"><button class="primary" id="mCont">${t().cont}</button></div>
+    </div></div>`;
+    document.getElementById('mCont').onclick = () => { modal=null; render(); };
+  }
+}
+async function doSave() {
+  if (!pending) return;
+  const k = key(pending.bookSlug, pending.heroId);
+  const res = await fetch(API + '/responses', {
+    method:'POST', credentials:'same-origin',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({
+      bookSlug: pending.bookSlug,
+      heroId: pending.heroId,
+      guess: progress.guesses[k],
+      bfi: progress.bfi[k]
+    })
+  });
+  const data = await res.json().catch(()=>({}));
+  if (!res.ok) {
+    const err = document.getElementById('saveErr');
+    if (err) err.textContent = data.error || t().err;
+    modal=null; pending=null; showModal();
+    return;
+  }
+  saved.add(k);
+  modal = 'saved';
+  pending = null;
+  if (data.completed) status = 'completed';
+  render();
+}
+
+boot();
+
+</script>
+</body>
+</html>

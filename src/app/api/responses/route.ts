@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { getRespondentIdFromCookie } from "@/lib/respondent";
+import { getOrCreateRespondentId, getRespondentIdFromCookie } from "@/lib/respondent";
 import {
   bookSetHash,
   heroKey,
@@ -53,11 +53,8 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-  const respondentId = await getRespondentIdFromCookie();
-  if (!respondentId) {
-    return NextResponse.json({ error: "Missing respondent cookie" }, { status: 401 });
-  }
-
+  // Ensure cookie exists even if browser dropped a previous Secure cookie on HTTP.
+  const respondentId = await getOrCreateRespondentId();
   const respondent = await prisma.respondent.findUnique({ where: { id: respondentId } });
   if (!respondent) {
     return NextResponse.json({ error: "Unknown respondent" }, { status: 401 });

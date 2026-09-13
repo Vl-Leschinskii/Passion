@@ -7,3 +7,6 @@ prisma/*.db
 tmp
 uploads
 tsconfig.tsbuildinfo
+
+# Self-signed TLS material (generate locally)
+nginx/certs/
