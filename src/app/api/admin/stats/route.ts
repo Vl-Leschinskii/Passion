@@ -19,6 +19,7 @@ export async function GET() {
     answers,
     recentAnswers,
     dailyRaw,
+    interests,
   ] = await Promise.all([
     prisma.respondent.count(),
     prisma.respondent.count({ where: { completedAt: { not: null } } }),
@@ -58,6 +59,20 @@ export async function GET() {
       ORDER BY 1 DESC
       LIMIT 30
     `,
+    prisma.interest.findMany({
+      orderBy: { createdAt: "desc" },
+      include: {
+        respondent: {
+          select: {
+            id: true,
+            createdAt: true,
+            completedAt: true,
+            locale: true,
+            _count: { select: { answers: true } },
+          },
+        },
+      },
+    }),
   ]);
 
   const heroMeta = new Map<string, { nameRu: string; nameEn: string; bookTitleRu: string; bookSlug: string }>();
@@ -184,5 +199,15 @@ export async function GET() {
         createdAt: a.createdAt.toISOString(),
       };
     }),
+    interests: interests.map((i) => ({
+      id: i.id,
+      email: i.email,
+      createdAt: i.createdAt.toISOString(),
+      respondentId: i.respondentId,
+      respondentCreatedAt: i.respondent.createdAt.toISOString(),
+      respondentCompletedAt: i.respondent.completedAt?.toISOString() || null,
+      locale: i.respondent.locale || null,
+      answersCount: i.respondent._count.answers,
+    })),
   });
 }

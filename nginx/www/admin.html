@@ -109,7 +109,8 @@
         <p class="sub" id="who">—</p>
       </div>
       <div class="row">
-        <a class="btn good" id="exportBtn" href="/passion/api/admin/export">Экспорт CSV</a>
+        <a class="btn good" id="exportBtn" href="/passion/api/admin/export">Ответы CSV</a>
+        <a class="btn good" id="exportContactsBtn" href="/passion/api/admin/export-contacts">Контакты CSV</a>
         <button type="button" class="ghost" id="logoutBtn">Выйти</button>
       </div>
     </div>
@@ -117,6 +118,24 @@
     <div class="grid" id="summary"></div>
 
     <div class="card" style="margin-top:16px">
+      <h3 style="margin-bottom:12px">Оставили e-mail для связи</h3>
+      <div style="overflow:auto; max-height:360px">
+        <table>
+          <thead>
+            <tr>
+              <th>E-mail</th>
+              <th>Когда оставил</th>
+              <th>Respondent</th>
+              <th>Ответов</th>
+              <th>Завершил тест</th>
+            </tr>
+          </thead>
+          <tbody id="contacts"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
       <h3 style="margin-bottom:12px">Типы по Гумилёву (все ответы)</h3>
       <div id="guesses"></div>
     </div>
@@ -207,9 +226,19 @@ async function loadStats() {
     ['С ответами', s.respondentsWithAnswers],
     ['Завершили', s.respondentsCompleted],
     ['Ответы по героям', s.answersTotal],
-    ['Email-интересы', s.interestsTotal],
+    ['Email для связи', s.interestsTotal],
     ['Книги / герои', s.publishedBooks + ' / ' + s.publishedHeroes],
   ].map(([label, val]) => `<div class="stat"><span>${label}</span><b>${val}</b></div>`).join('');
+
+  document.getElementById('contacts').innerHTML = (data.interests || []).map(i => `
+    <tr>
+      <td><a href="mailto:${i.email}" style="color:#9fd0ff">${i.email}</a></td>
+      <td>${new Date(i.createdAt).toLocaleString('ru-RU')}</td>
+      <td class="muted">${i.respondentId}</td>
+      <td>${i.answersCount}</td>
+      <td>${i.respondentCompletedAt ? new Date(i.respondentCompletedAt).toLocaleString('ru-RU') : '—'}</td>
+    </tr>
+  `).join('') || '<tr><td colspan="5" class="muted">Пока никто не оставил e-mail</td></tr>';
 
   const gt = data.guessTotals;
   const gTotal = (gt.passi||0)+(gt.garm||0)+(gt.sub||0) || 1;
