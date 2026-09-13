@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Пассионарный тест · BFI · 3 книги</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: radial-gradient(circle at 20% 10%, #142b42 0%, #081420 60%, #03080f 100%);
+    min-height: 100vh;
+    font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+    color: #e6f0fa;
+    padding: 24px 16px 60px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .app { max-width: 1180px; width: 100%; }
+
+  /* ---------- HEADER ---------- */
+  .brand { text-align: center; margin-bottom: 26px; }
+  .brand h1 {
+    font-size: 1.75rem; font-weight: 700; letter-spacing: -0.5px;
+    background: linear-gradient(90deg, #9fd0ff, #e2c98a);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .brand p { font-size: 0.85rem; opacity: 0.55; margin-top: 6px; }
+
+  /* ---------- BOOK TABS ---------- */
+  .book-tabs {
+    display: flex; justify-content: center; flex-wrap: wrap; gap: 10px;
+    margin-bottom: 20px;
+  }
+  .book-tabs button {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: #cfe2f5; padding: 11px 22px; border-radius: 60px;
+    font-size: 0.88rem; font-weight: 600; cursor: pointer;
+    transition: 0.2s;
+  }
+  .book-tabs button:hover { background: rgba(255,255,255,0.14); }
+  .book-tabs button.active {
+    background: linear-gradient(135deg, #2e6ea6, #3f8ed0);
+    border-color: #7bb3f0; color: #fff;
+    box-shadow: 0 0 22px rgba(63,142,208,0.45);
+  }
+
+  /* ---------- PROGRESS ---------- */
+  .progress-bar {
+    max-width: 520px; margin: 0 auto 22px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 40px;
+    height: 32px;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3f8ed0, #5fc1b0);
+    transition: width 0.35s ease;
+    border-radius: 40px;
+  }
+  .progress-label {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem; font-weight: 600; color: #f0f7ff;
+    letter-spacing: 0.4px;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+  }
+
+  /* ---------- HERO GRID ---------- */
+  .hero-grid {
+    display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
+    margin-bottom: 26px;
+  }
+  .hero-chip {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.13);
+    color: #cfe2f5; padding: 9px 18px; border-radius: 40px;
+    font-size: 0.85rem; cursor: pointer; transition: 0.18s;
+    font-weight: 500;
+  }
+  .hero-chip:hover { background: rgba(255,255,255,0.13); transform: translateY(-1px); }
+  .hero-chip.active {
+    background: linear-gradient(135deg, #3f8ed0, #5fa8e8);
+    border-color: #9ecbf0; color: #fff;
+    box-shadow: 0 0 16px rgba(63,142,208,0.5);
+  }
+  .hero-chip.done {
+    border-color: #5fc1b0;
+    background: rgba(95,193,176,0.15);
+  }
+
+  /* ---------- WORKSPACE ---------- */
+  .workspace {
+    background: rgba(255,255,255,0.055);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 32px;
+    padding: 30px 28px;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 20px 45px rgba(0,0,0,0.5);
+    animation: fadeIn 0.35s ease;
+  }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(8px);} to {opacity:1; transform:none;} }
+
+  .hero-title {
+    font-size: 2rem; font-weight: 700; letter-spacing: -0.6px;
+    text-align: center;
+  }
+  .hero-subtitle {
+    font-size: 0.9rem; color: #9dc0e0; text-align: center; margin-top: 6px;
+  }
+
+  .question {
+    font-size: 1.05rem; text-align: center; margin: 26px 0 18px;
+    color: #cfe0f0;
+  }
+
+  /* ---------- TYPE INFO (Гумилёв) ---------- */
+  .types-block {
+    margin: 26px 0 10px;
+    padding: 20px 18px;
+    background: rgba(63,142,208,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 22px;
+  }
+  .types-block > h3 {
+    font-size: 1.1rem; font-weight: 700; color: #e2c98a;
+    text-align: center; margin-bottom: 4px;
+  }
+  .types-block > p.sub {
+    font-size: 0.78rem; opacity: 0.6; text-align: center; margin-bottom: 16px;
+  }
+  .type-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 14px;
+  }
+  .type-card {
+    background: rgba(255,255,255,0.045);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 18px;
+    padding: 16px 18px;
+    font-size: 0.86rem;
+    line-height: 1.55;
+    color: #cfe0f0;
+  }
+  .type-card b {
+    color: #fff; display: block; margin-bottom: 8px; font-size: 0.98rem;
+  }
+  .type-card .ex {
+    display: block; margin-top: 10px; font-size: 0.82rem;
+    color: #e2c98a; font-style: italic;
+    border-top: 1px dashed rgba(255,255,255,0.12); padding-top: 8px;
+  }
+
+  /* ---------- BFI SCALE CARDS ---------- */
+  .bfi-scales {
+    margin: 24px 0 10px;
+  }
+  .bfi-scales > h3 {
+    font-size: 1.05rem; font-weight: 600; color: #e2c98a;
+    text-align: center; margin-bottom: 4px;
+  }
+  .bfi-scales > p.sub {
+    font-size: 0.78rem; opacity: 0.6; text-align: center; margin-bottom: 18px;
+  }
+  .bfi-scale-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+  .bfi-scale-card {
+    background: linear-gradient(135deg, rgba(63,142,208,0.1), rgba(95,193,176,0.07));
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 14px 16px;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    color: #c5d8ec;
+  }
+  .bfi-scale-card h4 {
+    color: #9fd0ff; font-size: 0.9rem; margin-bottom: 8px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .bfi-scale-card .range {
+    display: flex; justify-content: space-between;
+    font-size: 0.68rem; color: #8fa8c0; margin: 6px 0 8px;
+    border-bottom: 1px dashed rgba(255,255,255,0.08); padding-bottom: 6px;
+  }
+  .bfi-scale-card .pole { margin-bottom: 5px; }
+  .bfi-scale-card .pole b { color: #fff; }
+
+  /* ---------- CHOICE ---------- */
+  .choice-row {
+    display: flex; justify-content: center; flex-wrap: wrap; gap: 14px;
+    margin-bottom: 8px;
+  }
+  .choice-btn {
+    min-width: 200px;
+    padding: 16px 26px;
+    border-radius: 18px;
+    font-size: 0.95rem; font-weight: 600;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: 0.2s;
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+  }
+  .choice-btn .hint { font-size: 0.72rem; font-weight: 400; opacity: 0.75; }
+
+  .choice-btn[data-group="passi"] {
+    background: rgba(241,178,74,0.12);
+    border-color: rgba(241,178,74,0.5);
+    color: #f7cd84;
+  }
+  .choice-btn[data-group="passi"]:hover { background: rgba(241,178,74,0.28); }
+
+  .choice-btn[data-group="garm"] {
+    background: rgba(95,193,176,0.12);
+    border-color: rgba(95,193,176,0.5);
+    color: #8fdccf;
+  }
+  .choice-btn[data-group="garm"]:hover { background: rgba(95,193,176,0.28); }
+
+  .choice-btn[data-group="sub"] {
+    background: rgba(176,124,158,0.12);
+    border-color: rgba(176,124,158,0.5);
+    color: #d6a8c4;
+  }
+  .choice-btn[data-group="sub"]:hover { background: rgba(176,124,158,0.28); }
+
+  .choice-btn.picked {
+    box-shadow: 0 0 0 2px #fff inset, 0 0 20px rgba(255,255,255,0.25);
+    transform: scale(1.03);
+  }
+
+  /* ---------- BFI YES/NO ---------- */
+  .bfi-block {
+    margin-top: 26px;
+    padding-top: 22px;
+    border-top: 1px dashed rgba(255,255,255,0.14);
+  }
+  .bfi-block h3 {
+    font-size: 1rem; font-weight: 600; color: #e2c98a;
+    margin-bottom: 4px; text-align: center;
+  }
+  .bfi-block .bfi-note {
+    font-size: 0.78rem; opacity: 0.6; text-align: center; margin-bottom: 16px;
+  }
+  .bfi-row {
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 14px;
+    padding: 10px 14px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.035);
+    margin-bottom: 8px;
+    font-size: 0.88rem;
+  }
+  .bfi-row .bfi-label { color: #d9e8f7; }
+  .bfi-row .bfi-label small { display:block; opacity: 0.6; font-size: 0.72rem; margin-top: 3px; }
+  .bfi-actions { display: flex; gap: 8px; }
+  .bfi-btn {
+    padding: 7px 16px; border-radius: 30px; cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.05);
+    color: #cfe2f5; font-size: 0.8rem; font-weight: 600;
+    transition: 0.18s;
+  }
+  .bfi-btn:hover { background: rgba(255,255,255,0.13); }
+  .bfi-btn.yes.on { background: linear-gradient(135deg, #3f8ed0, #5fa8e8); border-color:#9ecbf0; color:#fff; box-shadow:0 0 14px rgba(63,142,208,0.5); }
+  .bfi-btn.no.on  { background: linear-gradient(135deg, #a05a7a, #c97a9a); border-color:#e0a8c0; color:#fff; box-shadow:0 0 14px rgba(200,120,150,0.5); }
+
+  /* ---------- VERDICT ---------- */
+  .verdict {
+    padding: 16px 20px;
+    border-radius: 18px;
+    font-size: 0.95rem; line-height: 1.55;
+    margin-top: 22px;
+    background: rgba(63,142,208,0.12);
+    border-left: 4px solid #3f8ed0;
+    color: #cfe0f0;
+  }
+  .verdict b { color: #fff; }
+  .verdict.warn {
+    background: rgba(241,178,74,0.1);
+    border-left-color: #f1b24a;
+  }
+
+  /* ---------- BOTTOM ACTION ---------- */
+  .bottom-action {
+    margin-top: 26px;
+    text-align: center;
+  }
+  .reveal-btn {
+    padding: 15px 34px;
+    border-radius: 40px;
+    font-size: 0.95rem; font-weight: 700;
+    cursor: pointer;
+    border: 1px dashed rgba(155,205,255,0.5);
+    background: rgba(63,142,208,0.12);
+    color: #bcdcff;
+    transition: 0.2s;
+    letter-spacing: 0.3px;
+  }
+  .reveal-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    border-style: solid;
+  }
+  .reveal-btn:not(:disabled):hover {
+    background: rgba(63,142,208,0.25);
+    transform: scale(1.02);
+  }
+
+  /* ---------- AI REVEAL SECTION ---------- */
+  .ai-section {
+    margin-top: 30px;
+    display: none;
+    animation: fadeIn 0.5s ease;
+  }
+  .ai-section.open { display: block; }
+
+  .ai-section h2 {
+    text-align: center;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #e2c98a;
+    margin-bottom: 6px;
+    letter-spacing: -0.3px;
+  }
+  .ai-section p.note {
+    text-align: center;
+    font-size: 0.82rem;
+    opacity: 0.6;
+    margin-bottom: 22px;
+  }
+
+  .ai-card {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 22px;
+    margin-bottom: 12px;
+    overflow: hidden;
+    transition: 0.2s;
+  }
+  .ai-card-head {
+    padding: 16px 22px;
+    display: flex; justify-content: space-between; align-items: center;
+    cursor: pointer;
+    gap: 14px;
+  }
+  .ai-card-head:hover { background: rgba(255,255,255,0.04); }
+  .ai-card-name { font-weight: 600; font-size: 0.98rem; }
+  .ai-card-tag {
+    font-size: 0.75rem; padding: 4px 12px; border-radius: 30px;
+    font-weight: 600; white-space: nowrap;
+  }
+  .ai-card-tag.passi { background: rgba(241,178,74,0.2); color: #f7cd84; }
+  .ai-card-tag.garm  { background: rgba(95,193,176,0.2); color: #8fdccf; }
+  .ai-card-tag.sub   { background: rgba(176,124,158,0.2); color: #d6a8c4; }
+
+  .ai-card-toggle {
+    font-size: 0.8rem; opacity: 0.5; transition: transform 0.25s;
+  }
+  .ai-card-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+    padding: 0 22px;
+  }
+  .ai-card.expanded .ai-card-body {
+    max-height: 900px;
+    padding: 0 22px 22px;
+  }
+  .ai-card.expanded .ai-card-toggle { transform: rotate(180deg); }
+
+  .ai-card-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.1fr;
+    gap: 22px;
+    align-items: center;
+    margin-top: 10px;
+  }
+  @media (max-width: 760px) { .ai-card-grid { grid-template-columns: 1fr; } }
+
+  .ai-axis-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 4px 20px;
+    font-size: 0.82rem;
+  }
+  .ai-axis-row {
+    display: flex; justify-content: space-between;
+    padding: 4px 0; border-bottom: 1px dashed rgba(255,255,255,0.07);
+  }
+  .ai-axis-row b { font-variant-numeric: tabular-nums; }
+
+  .ai-desc {
+    font-size: 0.88rem; line-height: 1.55; color: #bcd0e4;
+    border-left: 3px solid #3f8ed0; padding-left: 12px;
+    margin-bottom: 12px;
+  }
+
+  .ai-pole {
+    font-size: 0.78rem; color: #9dc0e0; margin-top: 10px; line-height: 1.5;
+    background: rgba(255,255,255,0.03);
+    padding: 8px 10px; border-radius: 10px;
+  }
+  .ai-pole b { color: #e2c98a; }
+
+  canvas.radar-mini {
+    width: 100%; max-width: 400px; aspect-ratio: 1/1; height: auto;
+    display: block; margin: 0 auto;
+  }
+
+  .empty {
+    text-align: center; padding: 40px 20px; opacity: 0.45;
+    font-size: 0.95rem;
+  }
+
+  .footer {
+    text-align: center; margin-top: 30px;
+    font-size: 0.75rem; opacity: 0.4; letter-spacing: 0.4px;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="brand">
+    <h1>🧭 Пассионарный тест героев · Big Five</h1>
+    <p>Оцените тип героя по Гумилёву, отметьте признаки BFI — и сравните с оценкой ИИ.</p>
+  </div>
+
+  <div class="book-tabs" id="bookTabs"></div>
+
+  <div class="progress-bar">
+    <div class="progress-fill" id="progressFill" style="width:0%"></div>
+    <div class="progress-label" id="progressLabel">0 / 0</div>
+  </div>
+
+  <div class="hero-grid" id="heroGrid"></div>
+
+  <div class="workspace" id="workspace">
+    <div class="empty">Выберите героя, чтобы начать</div>
+  </div>
+
+  <div class="bottom-action" id="bottomAction"></div>
+
+  <div class="ai-section" id="aiSection"></div>
+
+  <div class="footer">Митчелл · Скотт · Толстой — Big Five Inventory + типология Гумилёва</div>
+</div>
+
+<script>
+/* =========================================================
+   ШКАЛЫ BIG FIVE INVENTORY (BFI)
+   ========================================================= */
+const AXES = ['Открытость','Добросовестность','Экстраверсия','Доброжелательность','Нейротизм'];
+
+const BFI_SCALES = [
+  {
+    id:'O', label:'🔵 Открытость опыту (O)',
+    low:'0–33', mid:'34–66', high:'67–100',
+    highDesc:'Любопытство, креативность, интерес к новому, артистичность, готовность к изменениям.',
+    lowDesc:'Практичность, традиционность, предпочтение рутины, консерватизм.'
+  },
+  {
+    id:'C', label:'🟢 Добросовестность (C)',
+    low:'0–33', mid:'34–66', high:'67–100',
+    highDesc:'Организованность, самодисциплина, надёжность, стремление к достижениям, планирование.',
+    lowDesc:'Спонтанность, гибкость, неорганизованность, прокрастинация.'
+  },
+  {
+    id:'E', label:'🟡 Экстраверсия (E)',
+    low:'0–33', mid:'34–66', high:'67–100',
+    highDesc:'Общительность, энергичность, уверенность в себе, стремление к лидерству, позитивные эмоции.',
+    lowDesc:'Сдержанность, независимость, предпочтение уединения, глубина отношений.'
+  },
+  {
+    id:'A', label:'🟣 Доброжелательность (A)',
+    low:'0–33', mid:'34–66', high:'67–100',
+    highDesc:'Доверие, альтруизм, кооперативность, эмпатия, скромность.',
+    lowDesc:'Критичность, конкурентность, скептицизм, готовность к конфликтам, независимость в суждениях.'
+  },
+  {
+    id:'N', label:'🔴 Нейротизм (N)',
+    low:'0–33', mid:'34–66', high:'67–100',
+    highDesc:'Тревожность, эмоциональная нестабильность, уязвимость к стрессу, частые негативные эмоции.',
+    lowDesc:'Спокойствие, уверенность, устойчивость к стрессу, оптимизм (эмоциональная устойчивость).'
+  }
+];
+
+/* Соответствие «тип Гумилёва ↔ полюс BFI» (по Зимина, 2009).
+   Используется только для пояснений в карточках оценки ИИ. */
+const GUMILEV_BFI_TABLE = [
+  { scale:'Экстраверсия — Интроверсия',        p:'Экстраверсия',           g:'Интроверсия',        s:'Интроверсия' },
+  { scale:'Привязанность — Обособленность (A)', p:'Обособленность',         g:'Привязанность',      s:'Обособленность' },
+  { scale:'Самоконтроль — Импульсивность (C)',  p:'Импульсивность',         g:'Самоконтроль',       s:'Импульсивность' },
+  { scale:'Эмоц. неустойчивость — Устойчивость (N)', p:'Эмоц. неустойчивость', g:'Эмоц. устойчивость', s:'Эмоц. неустойчивость' },
+  { scale:'Экспрессивность — Практичность (O)', p:'Экспрессивность',        g:'Практичность',       s:'Практичность' }
+];
+
+const BFI_QUESTIONS = [
+  { id:'O', label:'Открытость опыту',   hint:'любознательность, воображение, интерес к новому' },
+  { id:'C', label:'Добросовестность',   hint:'организованность, дисциплина, надёжность' },
+  { id:'E', label:'Экстраверсия',       hint:'общительность, активность, энергия' },
+  { id:'A', label:'Доброжелательность', hint:'альтруизм, доверие, готовность помочь' },
+  { id:'N', label:'Нейротизм',          hint:'тревожность, ранимость, эмоциональная нестабильность' }
+];
+
+/* =========================================================
+   ТИПОЛОГИЯ ПО ГУМИЛЁВУ (развёрнутые описания + примеры)
+   ========================================================= */
+const GROUP_META = {
+  passi: {
+    label:'Пассионарий',
+    emoji:'⚡',
+    hint:'избыток энергии, сверхцель, ломка границ',
+    full:'Люди с избытком «пассионарной энергии»: они ставят сверхцель выше самосохранения, ломают нормы и часто меняют ход истории — ценой своей жизни и жизней окружающих. Импульс пассионарности может быть творческим (созидание империй, реформ, религий) или разрушительным (завоевания, тирания).',
+    ex:'Примеры: Александр Македонский, Юлий Цезарь, Наполеон, Пётр I, Жанна д’Арк, Че Гевара.'
+  },
+  garm: {
+    label:'Гармоничный (персистент)',
+    emoji:'🌿',
+    hint:'баланс энергии, основа социума',
+    full:'Люди с нормальным, сбалансированным уровнем энергии. Они не рвутся к сверхцели, но и не лишены воли: добросовестны, ценят семью и традицию, создают материальные и культурные блага, удерживают социальную ткань. Именно на них держится повседневная жизнь.',
+    ex:'Примеры: Марк Аврелий, Эразм Роттердамский, В. А. Жуковский, обычный крестьянин или ремесленник.'
+  },
+  sub: {
+    label:'Субпассионарий',
+    emoji:'🔍',
+    hint:'дефицит энергии, ведомость, инерция',
+    full:'Люди с пониженной энергетикой: не способны к длительному усилию, легко подчиняются более сильным, живут чужими идеями или прошлым. Могут быть умны и талантливы, но не имеют внутреннего мотора для действия.',
+    ex:'Примеры: Николай II в конце правления, Обломов И. А. Гончарова, многие «лишние люди» русской литературы.'
+  }
+};
+
+/* =========================================================
+   ДАННЫЕ ПО КНИГАМ  (O, C, E, A, N; −1…+1)
+   ========================================================= */
+const BOOKS = [
+  {
+    id:'gone', title:'Унесённые ветром',
+    heroes:[
+      { name:'Скарлетт О’Хара', sub:'Пассионарий-прагматик', group:'passi',
+        desc:'Выживает любой ценой, ломает правила, но не способна на бескорыстную жертву. Умна, прагматична, эмоционально нестабильна.',
+        scores:[0.6, 0.7, 0.6, -0.5, 0.4] },
+      { name:'Ретт Батлер', sub:'Пассионарий-циник', group:'passi',
+        desc:'Умён, независим, любит Скарлетт по-своему. Открыт новому, дисциплинирован, но не жертвует собой до конца.',
+        scores:[0.8, 0.8, 0.7, -0.1, -0.3] },
+      { name:'Мелани Уилкс', sub:'Гармоник с пассионарным ядром', group:'garm',
+        desc:'Тихая сила, моральный компас, умирает за других. Альтруистична, добросовестна, эмоционально устойчива.',
+        scores:[0.1, 0.6, -0.3, 0.9, -0.6] },
+      { name:'Эшли Уилкс', sub:'Субпассионарий-романтик', group:'sub',
+        desc:'Умён, но беспомощен, живёт прошлым, не способен к действию. Высокая открытость при низкой добросовестности.',
+        scores:[0.7, -0.5, -0.6, 0.5, 0.4] },
+      { name:'Мамушка', sub:'Гармоник-хранитель', group:'garm',
+        desc:'Опора семьи, консервативна, предана до конца. Добросовестна, но закрыта новому.',
+        scores:[-0.5, 0.7, 0.2, 0.8, 0.0] },
+      { name:'Джеральд О’Хара', sub:'Пассионарий на спаде', group:'passi',
+        desc:'Сила в прошлом, в настоящем — инерция и гибель. Импульсивен, экстравертирован, ригиден.',
+        scores:[-0.3, 0.4, 0.8, 0.4, -0.2] },
+      { name:'Индия Уилкс', sub:'Гармоник с уклоном вниз', group:'garm',
+        desc:'Жертва обстоятельств, не борец. Сдержанна, тревожна, но добра.',
+        scores:[0.0, 0.3, -0.5, 0.6, 0.5] },
+      { name:'Бонни Батлер', sub:'Ребёнок-гармоник', group:'garm',
+        desc:'Свет в жизни Ретта, её смерть — точка невозврата. Открыта, активна, но хрупка.',
+        scores:[0.5, -0.2, 0.6, 0.7, 0.3] }
+    ]
+  },
+  {
+    id:'ivanhoe', title:'Айвенго',
+    heroes:[
+      { name:'Айвенго', sub:'Пассионарий-рыцарь', group:'passi',
+        desc:'Честь, любовь, готовность умереть за идею. Дисциплинирован, экстравертирован, устойчив.',
+        scores:[0.4, 0.8, 0.6, 0.7, -0.4] },
+      { name:'Ревекка', sub:'Пассионарий-целительница', group:'passi',
+        desc:'Мудрая, самоотверженная, сильнее всех духом. Открыта, добросовестна, альтруистична.',
+        scores:[0.9, 0.7, -0.2, 0.9, -0.3] },
+      { name:'Ричард Львиное Сердце', sub:'Пассионарий-воин', group:'passi',
+        desc:'Величие и хаос, герой без стратегии. Максимальная экстраверсия и открытость, низкая добросовестность.',
+        scores:[0.7, -0.2, 1.0, 0.3, -0.1] },
+      { name:'Бриан де Буагильбер', sub:'Деструктивный пассионарий', group:'passi',
+        desc:'Сила без чести, страсть без любви. Высокая воля, низкая доброжелательность.',
+        scores:[0.5, 0.7, 0.5, -0.8, 0.3] },
+      { name:'Седрик Сакс', sub:'Фанатик прошлого', group:'sub',
+        desc:'Живёт идеей, но губит всех вокруг. Закрыт новому, ригиден, конфликтен.',
+        scores:[-0.8, 0.5, 0.4, -0.3, 0.4] },
+      { name:'Ровена', sub:'Гармоник-пассив', group:'garm',
+        desc:'Красива, добра, но безынициативна. Средние значения по всем шкалам, чуть выше доброжелательность.',
+        scores:[0.1, 0.3, -0.4, 0.7, -0.2] },
+      { name:'Локсли (Робин Гуд)', sub:'Пассионарий-народный герой', group:'passi',
+        desc:'Лидер, защитник, мастер тактики. Экстраверт, добросовестен, альтруистичен.',
+        scores:[0.5, 0.7, 0.9, 0.8, -0.5] },
+      { name:'Вамба', sub:'Гармоник-трикстер', group:'garm',
+        desc:'Шут, но с сердцем героя. Открыт, экстравертирован, добр.',
+        scores:[0.7, 0.0, 0.7, 0.7, 0.1] }
+    ]
+  },
+  {
+    id:'warpeace', title:'Война и мир',
+    heroes:[
+      { name:'Андрей Болконский', sub:'Пассионарий-интеллектуал', group:'passi',
+        desc:'Ищет смысл, но оторван от людей. Высокая открытость и добросовестность, низкая доброжелательность.',
+        scores:[0.8, 0.8, -0.3, -0.4, 0.5] },
+      { name:'Пьер Безухов', sub:'Гармоник с поиском', group:'garm',
+        desc:'Добрый, ищущий, ведомый. Открыт, альтруистичен, но неорганизован.',
+        scores:[0.8, -0.5, 0.1, 0.9, 0.4] },
+      { name:'Наташа Ростова', sub:'Гармоник — жизненная сила', group:'garm',
+        desc:'Интуиция, любовь, ошибки, искупление. Экстравертирована, открыта, доброжелательна.',
+        scores:[0.7, -0.3, 0.9, 0.8, 0.3] },
+      { name:'Николай Ростов', sub:'Гармоник-исполнитель', group:'garm',
+        desc:'Честный, простой, верный долгу. Добросовестен, устойчив, экстравертирован.',
+        scores:[0.0, 0.7, 0.6, 0.7, -0.6] },
+      { name:'Элен Курагина', sub:'Деструктивный пассионарий', group:'passi',
+        desc:'Холодная, расчётливая, пустая. Экстравертирована, но крайне низкая доброжелательность.',
+        scores:[0.2, 0.5, 0.8, -0.9, -0.2] },
+      { name:'Анатоль Курагин', sub:'Субпассионарий-гедонист', group:'sub',
+        desc:'Красив, глуп, разрушителен. Импульсивен, низкая добросовестность и доброжелательность.',
+        scores:[0.1, -0.9, 0.7, -0.7, 0.0] },
+      { name:'Кутузов', sub:'Пассионарий-стратег', group:'passi',
+        desc:'Мудрость, терпение, победа через отступление. Добросовестен, устойчив, альтруистичен.',
+        scores:[0.5, 0.9, 0.2, 0.7, -0.8] },
+      { name:'Марья Болконская', sub:'Гармоник-святая', group:'garm',
+        desc:'Терпение, вера, любовь без условий. Альтруистична, добросовестна, тревожна.',
+        scores:[0.2, 0.6, -0.6, 0.9, 0.5] },
+      { name:'Наполеон Бонапарт', sub:'Пассионарий-завоеватель', group:'passi',
+        desc:'Гигант воли и амбиций; для Толстого — символ исторической иллюзии. Максимальная экстраверсия, низкая доброжелательность.',
+        scores:[0.6, 0.8, 0.9, -0.7, -0.1] }
+    ]
+  }
+];
+
+/* =========================================================
+   СОСТОЯНИЕ
+   ========================================================= */
+let currentBook = 0;
+let currentHero = -1;
+let guesses = {};
+let bfiAnswers = {};
+let aiRevealed = {};
+
+const keyOf = (b, h) => `${BOOKS[b].id}-${h}`;
+const bookKey = (b) => BOOKS[b].id;
+
+const bookTabsEl = document.getElementById('bookTabs');
+const heroGridEl = document.getElementById('heroGrid');
+const workspaceEl = document.getElementById('workspace');
+const bottomActionEl = document.getElementById('bottomAction');
+const aiSectionEl = document.getElementById('aiSection');
+const progressFill = document.getElementById('progressFill');
+const progressLabel = document.getElementById('progressLabel');
+
+/* =========================================================
+   ПРОГРЕСС
+   ========================================================= */
+function updateProgress() {
+  const book = BOOKS[currentBook];
+  const total = book.heroes.length;
+  let done = 0;
+  book.heroes.forEach((_, i) => {
+    const k = keyOf(currentBook, i);
+    if (guesses[k] && bfiAnswers[k] && Object.keys(bfiAnswers[k]).length === 5) done++;
+  });
+  const pct = total ? (done / total) * 100 : 0;
+  progressFill.style.width = pct + '%';
+  progressLabel.textContent = `${done} / ${total}`;
+}
+
+/* =========================================================
+   РЕНДЕР КНИГ
+   ========================================================= */
+function renderBookTabs() {
+  bookTabsEl.innerHTML = '';
+  BOOKS.forEach((b, i) => {
+    const btn = document.createElement('button');
+    btn.textContent = b.title;
+    if (i === currentBook) btn.classList.add('active');
+    btn.onclick = () => {
+      currentBook = i;
+      currentHero = -1;
+      renderAll();
+    };
+    bookTabsEl.appendChild(btn);
+  });
+}
+
+/* =========================================================
+   РЕНДЕР СПИСКА ГЕРОЕВ
+   ========================================================= */
+function renderHeroGrid() {
+  heroGridEl.innerHTML = '';
+  const book = BOOKS[currentBook];
+  book.heroes.forEach((h, i) => {
+    const k = keyOf(currentBook, i);
+    const done = guesses[k] && bfiAnswers[k] && Object.keys(bfiAnswers[k]).length === 5;
+    const chip = document.createElement('button');
+    chip.className = 'hero-chip';
+    if (i === currentHero) chip.classList.add('active');
+    if (done) chip.classList.add('done');
+    chip.textContent = h.name + (done ? ' ✓' : '');
+    chip.onclick = () => {
+      currentHero = i;
+      renderAll();
+    };
+    heroGridEl.appendChild(chip);
+  });
+}
+
+/* =========================================================
+   БЛОК «РАЗВЁРНУТЫЕ ОПИСАНИЯ ТИПОВ ПО ГУМИЛЁВУ»
+   ========================================================= */
+function buildTypesBlock() {
+  const wrap = document.createElement('div');
+  wrap.className = 'types-block';
+
+  const h = document.createElement('h3');
+  h.textContent = '📚 Развёрнутые описания типов по Гумилёву';
+  wrap.appendChild(h);
+
+  const p = document.createElement('p');
+  p.className = 'sub';
+  p.textContent = 'Три типа пассионарности с примерами из общеизвестной истории.';
+  wrap.appendChild(p);
+
+  const info = document.createElement('div');
+  info.className = 'type-info';
+
+  Object.entries(GROUP_META).forEach(([gid, meta]) => {
+    const c = document.createElement('div');
+    c.className = 'type-card';
+    c.innerHTML = `<b>${meta.emoji} ${meta.label}</b>${meta.full}<span class="ex">${meta.ex}</span>`;
+    info.appendChild(c);
+  });
+
+  wrap.appendChild(info);
+  return wrap;
+}
+
+/* =========================================================
+   БЛОК СО СПРАВКОЙ ПО ШКАЛАМ BFI
+   ========================================================= */
+function buildBfiScalesBlock() {
+  const wrap = document.createElement('div');
+  wrap.className = 'bfi-scales';
+
+  const h = document.createElement('h3');
+  h.textContent = '🎯 Шкалы Big Five Inventory (BFI)';
+  wrap.appendChild(h);
+
+  const p = document.createElement('p');
+  p.className = 'sub';
+  p.textContent = 'Каждая шкала оценивается от 0 до 100. Ниже — что означает высокий и низкий полюс.';
+  wrap.appendChild(p);
+
+  const grid = document.createElement('div');
+  grid.className = 'bfi-scale-grid';
+
+  BFI_SCALES.forEach(s => {
+    const c = document.createElement('div');
+    c.className = 'bfi-scale-card';
+    c.innerHTML = `
+      <h4>${s.label}</h4>
+      <div class="range"><span>низкая: ${s.low}</span><span>средняя: ${s.mid}</span><span>высокая: ${s.high}</span></div>
+      <div class="pole"><b>Высокая:</b> ${s.highDesc}</div>
+      <div class="pole"><b>Низкая:</b> ${s.lowDesc}</div>
+    `;
+    grid.appendChild(c);
+  });
+
+  wrap.appendChild(grid);
+  return wrap;
+}
+
+/* =========================================================
+   РЕНДЕР РАБОЧЕЙ ОБЛАСТИ
+   Порядок:
+     1. Заголовок героя.
+     2. Шаг 1 — выбор типа по Гумилёву.
+     3. Развёрнутые описания типов (с примерами).
+     4. Шаг 2 — BFI-вопрос Да/Нет.
+     5. Справка по шкалам BFI.
+     6. Вердикт.
+   ========================================================= */
+function renderWorkspace() {
+  workspaceEl.innerHTML = '';
+
+  if (currentHero < 0) {
+    workspaceEl.innerHTML = '<div class="empty">Выберите героя, чтобы оценить его</div>';
+    return;
+  }
+
+  const book = BOOKS[currentBook];
+  const hero = book.heroes[currentHero];
+  const k = keyOf(currentBook, currentHero);
+  const guess = guesses[k];
+  const bfi = bfiAnswers[k] || {};
+
+  /* 1. заголовок героя */
+  const title = document.createElement('div');
+  title.className = 'hero-title';
+  title.textContent = hero.name;
+  workspaceEl.appendChild(title);
+
+  const sub = document.createElement('div');
+  sub.className = 'hero-subtitle';
+  sub.textContent = book.title;
+  workspaceEl.appendChild(sub);
+
+  /* 2. Шаг 1 — выбор типа */
+  const q1 = document.createElement('div');
+  q1.className = 'question';
+  q1.textContent = '🤔 Шаг 1. К какому типу по Гумилёву вы отнесёте этого героя?';
+  workspaceEl.appendChild(q1);
+
+  const row = document.createElement('div');
+  row.className = 'choice-row';
+
+  Object.entries(GROUP_META).forEach(([gid, meta]) => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.dataset.group = gid;
+    btn.innerHTML = `<span>${meta.emoji} ${meta.label}</span><span class="hint">${meta.hint}</span>`;
+    if (guess === gid) btn.classList.add('picked');
+    btn.onclick = () => {
+      guesses[k] = gid;
+      renderAll();
+    };
+    row.appendChild(btn);
+  });
+  workspaceEl.appendChild(row);
+
+  /* 3. Развёрнутые описания типов */
+  workspaceEl.appendChild(buildTypesBlock());
+
+  /* 4. Шаг 2 — BFI Да/Нет */
+  const bfiBlock = document.createElement('div');
+  bfiBlock.className = 'bfi-block';
+  bfiBlock.innerHTML = `
+    <h3>🧠 Шаг 2. Какими признаками BFI, по вашему мнению, обладает герой?</h3>
+    <p class="bfi-note">Отметьте «Да» или «Нет» по каждой из пяти шкал.</p>
+  `;
+
+  BFI_QUESTIONS.forEach(qq => {
+    const rowEl = document.createElement('div');
+    rowEl.className = 'bfi-row';
+
+    const label = document.createElement('div');
+    label.className = 'bfi-label';
+    label.innerHTML = `${qq.label}<small>${qq.hint}</small>`;
+
+    const actions = document.createElement('div');
+    actions.className = 'bfi-actions';
+
+    const yes = document.createElement('button');
+    yes.className = 'bfi-btn yes';
+    yes.textContent = 'Да';
+    if (bfi[qq.id] === true) yes.classList.add('on');
+    yes.onclick = () => {
+      bfiAnswers[k] = { ...(bfiAnswers[k] || {}), [qq.id]: true };
+      renderAll();
+    };
+
+    const no = document.createElement('button');
+    no.className = 'bfi-btn no';
+    no.textContent = 'Нет';
+    if (bfi[qq.id] === false) no.classList.add('on');
+    no.onclick = () => {
+      bfiAnswers[k] = { ...(bfiAnswers[k] || {}), [qq.id]: false };
+      renderAll();
+    };
+
+    actions.appendChild(yes);
+    actions.appendChild(no);
+    rowEl.appendChild(label);
+    rowEl.appendChild(actions);
+    bfiBlock.appendChild(rowEl);
+  });
+
+  workspaceEl.appendChild(bfiBlock);
+
+  /* 5. Справка по шкалам BFI */
+  workspaceEl.appendChild(buildBfiScalesBlock());
+
+  /* 6. Вердикт / подсказка */
+  const bfiDone = Object.keys(bfi).length === 5;
+  if (guess && bfiDone) {
+    const v = document.createElement('div');
+    v.className = 'verdict';
+    v.innerHTML = `✅ Готово. Нажмите кнопку ниже, чтобы увидеть оценку ИИ по BFI.`;
+    workspaceEl.appendChild(v);
+  } else if (guess && !bfiDone) {
+    const v = document.createElement('div');
+    v.className = 'verdict warn';
+    v.innerHTML = `⚠️ Осталось ответить на BFI-вопросы: ${5 - Object.keys(bfi).length} из 5.`;
+    workspaceEl.appendChild(v);
+  }
+}
+
+/* =========================================================
+   НИЖНЯЯ КНОПКА — ПОКАЗАТЬ ОЦЕНКУ ИИ
+   ========================================================= */
+function renderBottomAction() {
+  bottomActionEl.innerHTML = '';
+  const book = BOOKS[currentBook];
+  const total = book.heroes.length;
+  let done = 0;
+  book.heroes.forEach((_, i) => {
+    const k = keyOf(currentBook, i);
+    if (guesses[k] && bfiAnswers[k] && Object.keys(bfiAnswers[k]).length === 5) done++;
+  });
+
+  const allDone = done === total;
+  const revealed = !!aiRevealed[bookKey(currentBook)];
+
+  const btn = document.createElement('button');
+  btn.className = 'reveal-btn';
+
+  if (!allDone) {
+    btn.disabled = true;
+    btn.textContent = `🔒 Показать оценку ИИ по BFI (осталось ${total - done})`;
+  } else if (revealed) {
+    btn.textContent = '🙈 Скрыть оценку ИИ по BFI';
+    btn.onclick = () => {
+      aiRevealed[bookKey(currentBook)] = false;
+      renderAll();
+    };
+  } else {
+    btn.textContent = '🔓 Показать оценку ИИ по BFI';
+    btn.onclick = () => {
+      aiRevealed[bookKey(currentBook)] = true;
+      renderAll();
+      setTimeout(() => aiSectionEl.scrollIntoView({behavior:'smooth', block:'start'}), 50);
+    };
+  }
+
+  bottomActionEl.appendChild(btn);
+}
+
+/* =========================================================
+   СЕКЦИЯ С ОЦЕНКОЙ ИИ ПО BFI
+   ========================================================= */
+function renderAISection() {
+  aiSectionEl.innerHTML = '';
+  const revealed = !!aiRevealed[bookKey(currentBook)];
+  if (!revealed) {
+    aiSectionEl.classList.remove('open');
+    return;
+  }
+  aiSectionEl.classList.add('open');
+
+  const book = BOOKS[currentBook];
+
+  const h2 = document.createElement('h2');
+  h2.textContent = `📊 Оценка ИИ по Big Five Inventory · ${book.title}`;
+  aiSectionEl.appendChild(h2);
+
+  const note = document.createElement('p');
+  note.className = 'note';
+  note.textContent = 'Нажмите на карточку, чтобы раскрыть радар, числовые значения и пояснение полюсов.';
+  aiSectionEl.appendChild(note);
+
+  book.heroes.forEach((hero, idx) => {
+    const card = document.createElement('div');
+    card.className = 'ai-card';
+
+    const head = document.createElement('div');
+    head.className = 'ai-card-head';
+    const meta = GROUP_META[hero.group];
+
+    const k = keyOf(currentBook, idx);
+    const userGuess = guesses[k];
+    let userMark = '';
+    if (userGuess && userGuess !== hero.group) {
+      userMark = ` · ваш выбор: ${GROUP_META[userGuess].emoji}`;
+    } else if (userGuess) {
+      userMark = ' · совпало ✓';
+    }
+
+    head.innerHTML = `
+      <div class="ai-card-name">${hero.name}${userMark}</div>
+      <div class="ai-card-tag ${hero.group}">${meta.emoji} ${meta.label}</div>
+      <div class="ai-card-toggle">▼</div>
+    `;
+    head.onclick = () => card.classList.toggle('expanded');
+
+    const body = document.createElement('div');
+    body.className = 'ai-card-body';
+
+    const grid = document.createElement('div');
+    grid.className = 'ai-card-grid';
+
+    const left = document.createElement('div');
+
+    const desc = document.createElement('div');
+    desc.className = 'ai-desc';
+    desc.textContent = hero.desc;
+    left.appendChild(desc);
+
+    const axisList = document.createElement('div');
+    axisList.className = 'ai-axis-list';
+    AXES.forEach((axis, i) => {
+      const r = document.createElement('div');
+      r.className = 'ai-axis-row';
+      const v = hero.scores[i];
+      const color = v > 0.3 ? '#f7cd84' : v < -0.3 ? '#d6a8c4' : '#8fdccf';
+      r.innerHTML = `<span>${axis}</span><b style="color:${color}">${v.toFixed(1)}</b>`;
+      axisList.appendChild(r);
+    });
+    left.appendChild(axisList);
+
+    const pole = document.createElement('div');
+    pole.className = 'ai-pole';
+    const high = [], low = [];
+    AXES.forEach((ax, i) => {
+      const v = hero.scores[i];
+      if (v > 0.3) high.push(ax.toLowerCase());
+      else if (v < -0.3) low.push(ax.toLowerCase());
+    });
+    pole.innerHTML = `
+      <b>Профиль:</b>
+      ${high.length ? `выражены — ${high.join(', ')}.` : ''}
+      ${low.length ? ` снижены — ${low.join(', ')}.` : ''}
+    `;
+    left.appendChild(pole);
+
+    const right = document.createElement('div');
+    const cnv = document.createElement('canvas');
+    cnv.className = 'radar-mini';
+    cnv.width = 640; cnv.height = 640;
+    right.appendChild(cnv);
+
+    grid.appendChild(left);
+    grid.appendChild(right);
+    body.appendChild(grid);
+
+    card.appendChild(head);
+    card.appendChild(body);
+    aiSectionEl.appendChild(card);
+
+    drawRadar(cnv, hero.scores);
+  });
+}
+
+/* =========================================================
+   РАДАР НА 5 ОСЕЙ
+   ========================================================= */
+function drawRadar(canvas, scores) {
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height;
+  const cx = w/2, cy = h/2;
+  const R = Math.min(w,h) * 0.36;
+  const N = AXES.length;
+  const step = (Math.PI*2)/N;
+
+  ctx.clearRect(0,0,w,h);
+
+  for (let ring=1; ring<=3; ring++){
+    const r = R * ring/3;
+    ctx.beginPath();
+    for (let i=0;i<=N;i++){
+      const a = -Math.PI/2 + i*step;
+      const x = cx + r*Math.cos(a);
+      const y = cy + r*Math.sin(a);
+      i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    }
+    ctx.closePath();
+    ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+  }
+
+  ctx.beginPath();
+  ctx.arc(cx, cy, R*0.5, 0, Math.PI*2);
+  ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+  ctx.setLineDash([4,5]);
+  ctx.lineWidth = 1.4;
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.font = '600 14px "Segoe UI", system-ui, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  for (let i=0;i<N;i++){
+    const a = -Math.PI/2 + i*step;
+    const x = cx + R*Math.cos(a);
+    const y = cy + R*Math.sin(a);
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(x, y);
+    ctx.strokeStyle = 'rgba(255,255,255,0.14)';
+    ctx.lineWidth = 1.3;
+    ctx.stroke();
+
+    const lx = cx + R*1.15*Math.cos(a);
+    const ly = cy + R*1.15*Math.sin(a);
+    ctx.fillStyle = '#b6d0e8';
+    ctx.fillText(AXES[i], lx, ly);
+  }
+
+  ctx.beginPath();
+  for (let i=0;i<N;i++){
+    const v = Math.max(-1, Math.min(1, scores[i]));
+    const r = R * ((v+1)/2);
+    const a = -Math.PI/2 + i*step;
+    const x = cx + r*Math.cos(a);
+    const y = cy + r*Math.sin(a);
+    i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+  }
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(63,142,208,0.3)';
+  ctx.fill();
+  ctx.strokeStyle = '#7bb3f0';
+  ctx.lineWidth = 3;
+  ctx.stroke();
+
+  ctx.font = 'bold 12px "Segoe UI", sans-serif';
+  for (let i=0;i<N;i++){
+    const v = Math.max(-1, Math.min(1, scores[i]));
+    const r = R * ((v+1)/2);
+    const a = -Math.PI/2 + i*step;
+    const x = cx + r*Math.cos(a);
+    const y = cy + r*Math.sin(a);
+
+    ctx.beginPath();
+    ctx.arc(x, y, 5.5, 0, Math.PI*2);
+    ctx.fillStyle = '#eaf4ff';
+    ctx.shadowColor = '#7bb3f0';
+    ctx.shadowBlur = 10;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    ctx.fillStyle = '#eaf2fa';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'bottom';
+    ctx.shadowColor = 'rgba(0,0,0,0.8)';
+    ctx.shadowBlur = 6;
+    ctx.fillText(v.toFixed(1), x, y - 9);
+    ctx.shadowBlur = 0;
+  }
+}
+
+/* =========================================================
+   ОБЩИЙ РЕНДЕР
+   ========================================================= */
+function renderAll() {
+  renderBookTabs();
+  renderHeroGrid();
+  renderWorkspace();
+  renderBottomAction();
+  renderAISection();
+  updateProgress();
+}
+
+/* СТАРТ */
+renderAll();
+</script>
+</body>
+</html>
