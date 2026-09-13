@@ -36,7 +36,29 @@ Allowlisted email (default `vleschinskii@gmail.com`) + `ADMIN_TOKEN` from `.env`
 - CSV export: `/passion/api/admin/export` (after login)
 - Configure emails: `ADMIN_EMAILS=a@x.com,b@y.com`
 - **Book upload:** `.doc` / `.docx` / `.pdf` → `uploads/books/` on the server
-- **Analyze:** button «Разобрать» runs LLM (`OPENAI_API_KEY` required) and publishes the book into the quiz
+- **Analyze:** button «Разобрать» runs LLM and publishes the book into the quiz
+
+### LLM for «Разобрать» (DeepSeek by default)
+
+Get a key at [platform.deepseek.com/api_keys](https://platform.deepseek.com/api_keys), then in `.env`:
+
+```env
+DEEPSEEK_API_KEY="sk-..."
+OPENAI_BASE_URL="https://api.deepseek.com/v1"
+OPENAI_MODEL="deepseek-chat"
+```
+
+(`OPENAI_API_KEY` or `LLM_API_KEY` also work as aliases.)
+
+**Qwen (DashScope compatible mode)** — same code, different env:
+
+```env
+OPENAI_API_KEY="<DashScope key>"
+OPENAI_BASE_URL="https://dashscope.aliyuncs.com/compatible-mode/v1"
+OPENAI_MODEL="qwen-plus"
+```
+
+Restart Next after changing `.env`.
 
 Default DB URL: `postgresql://passion:passion@localhost:5433/passion`
 
@@ -78,7 +100,7 @@ npx tsx scripts/apply-drive-credentials.ts /path/to/downloaded-sa.json
 ```
 
 5. Share the Drive folder with the printed `...@....iam.gserviceaccount.com` email (**Viewer**).
-6. Set `OPENAI_API_KEY` in `.env` (needed to analyse **new** books).
+6. Set `DEEPSEEK_API_KEY` in `.env` (needed to analyse **new** books; see LLM section above).
 7. Restart Next and run:
 
 ```bash
