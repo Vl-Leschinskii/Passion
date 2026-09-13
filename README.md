@@ -24,9 +24,23 @@ npm run db:seed
 npm run dev
 ```
 
-Open [http://localhost:3010](http://localhost:3010) (port **3010** to avoid clashing with other local apps on 3000).
+Open [http://localhost:3010/passion](http://localhost:3010/passion) (direct) or via gateway [http://localhost/passion](http://localhost/passion).
+
+**Production URL on this server:** [http://217.160.139.56/passion](http://217.160.139.56/passion)
 
 Default DB URL: `postgresql://passion:passion@localhost:5433/passion`
+
+### Production gateway (`/passion` on port 80)
+
+```bash
+docker compose up -d          # db + nginx gateway on :80
+npm run build && npm run start  # Next on :3010 with basePath=/passion
+```
+
+Nginx proxies:
+- `/passion` → Next.js `:3010`
+- `/` → existing site on `:3001`
+
 
 ## Behaviour
 

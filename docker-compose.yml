@@ -17,5 +17,18 @@ services:
       timeout: 5s
       retries: 10
 
+  gateway:
+    image: nginx:1.27-alpine
+    container_name: passion-gateway
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - db
+
 volumes:
   passion_pgdata:

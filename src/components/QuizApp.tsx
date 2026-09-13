@@ -16,6 +16,7 @@ import {
   type BfiAnswers,
   type GumilevGroup,
 } from "@/lib/quiz";
+import { apiUrl } from "@/lib/base-path";
 
 export type ApiHero = {
   id: string;
@@ -263,7 +264,7 @@ export function QuizApp({
     setSaveState("saving");
     setSaveError("");
     try {
-      const res = await fetch("/api/responses", {
+      const res = await fetch(apiUrl("/api/responses"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

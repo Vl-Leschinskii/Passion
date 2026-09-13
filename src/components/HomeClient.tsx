@@ -9,6 +9,7 @@ import {
 } from "@/components/QuizApp";
 import { translations, type Locale } from "@/i18n/dict";
 import type { BfiAnswers, GumilevGroup } from "@/lib/quiz";
+import { apiUrl } from "@/lib/base-path";
 
 type MeStatus = "new" | "in_progress" | "completed";
 
@@ -36,8 +37,8 @@ export function HomeClient() {
     (async () => {
       try {
         const [meRes, booksRes] = await Promise.all([
-          fetch("/api/me"),
-          fetch("/api/books"),
+          fetch(apiUrl("/api/me")),
+          fetch(apiUrl("/api/books")),
         ]);
         if (!meRes.ok || !booksRes.ok) throw new Error("Failed to load");
         const me = (await meRes.json()) as {

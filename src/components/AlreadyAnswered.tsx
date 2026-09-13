@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { LangSwitch } from "./LangSwitch";
 import { translations, type Locale } from "@/i18n/dict";
+import { apiUrl } from "@/lib/base-path";
 
 export function AlreadyAnswered({
   locale,
@@ -21,7 +22,7 @@ export function AlreadyAnswered({
     setStatus("loading");
     setMessage("");
     try {
-      const res = await fetch("/api/interest", {
+      const res = await fetch(apiUrl("/api/interest"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
