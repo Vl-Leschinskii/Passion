@@ -1,0 +1,117 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Respondent {
+  id          String       @id @db.Uuid
+  createdAt   DateTime     @default(now())
+  completedAt DateTime?
+  locale      String?
+  response    Response?
+  answers     HeroAnswer[]
+  interests   Interest[]
+}
+
+model Response {
+  id           String     @id @default(cuid())
+  respondentId String     @unique @db.Uuid
+  respondent   Respondent @relation(fields: [respondentId], references: [id], onDelete: Cascade)
+  payload      Json
+  bookSetHash  String
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+model HeroAnswer {
+  id           String     @id @default(cuid())
+  respondentId String     @db.Uuid
+  respondent   Respondent @relation(fields: [respondentId], references: [id], onDelete: Cascade)
+  heroId       String
+  bookSlug     String
+  guess        String
+  bfi          Json
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@unique([respondentId, heroId])
+  @@index([respondentId])
+  @@index([bookSlug])
+}
+
+model Interest {
+  id           String     @id @default(cuid())
+  respondentId String     @db.Uuid
+  respondent   Respondent @relation(fields: [respondentId], references: [id], onDelete: Cascade)
+  email        String
+  createdAt    DateTime   @default(now())
+
+  @@index([email])
+  @@index([respondentId])
+}
+
+enum BookStatus {
+  draft
+  published
+  failed
+}
+
+model Book {
+  id                 String     @id @default(cuid())
+  slug               String     @unique
+  titleRu            String
+  titleEn            String
+  sortOrder          Int        @default(0)
+  status             BookStatus @default(draft)
+  sourceDriveFileId  String?
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+  heroes             Hero[]
+  driveFile          DriveFile?
+
+  @@index([status, sortOrder])
+}
+
+model Hero {
+  id        String   @id @default(cuid())
+  bookId    String
+  book      Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  sortOrder Int      @default(0)
+  nameRu    String
+  nameEn    String
+  subRu     String
+  subEn     String
+  group     String
+  descRu    String
+  descEn    String
+  scores    Json
+
+  @@index([bookId, sortOrder])
+}
+
+enum DriveFileStatus {
+  seen
+  processing
+  done
+  error
+  skipped
+}
+
+model DriveFile {
+  id           String          @id @default(cuid())
+  fileId       String          @unique
+  name         String
+  mimeType     String?
+  modifiedTime DateTime?
+  status       DriveFileStatus @default(seen)
+  error        String?
+  bookId       String?         @unique
+  book         Book?           @relation(fields: [bookId], references: [id], onDelete: SetNull)
+  syncedAt     DateTime?
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+}

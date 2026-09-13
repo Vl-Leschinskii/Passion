@@ -1,0 +1,21 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: passion-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: passion
+      POSTGRES_PASSWORD: passion
+      POSTGRES_DB: passion
+    ports:
+      - "5433:5432"
+    volumes:
+      - passion_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U passion -d passion"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  passion_pgdata:
