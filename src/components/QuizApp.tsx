@@ -209,13 +209,24 @@ export function QuizApp({
   const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [saveError, setSaveError] = useState("");
   const [completed, setCompleted] = useState(false);
-  const savedKeysRef = useRef<Set<string>>(new Set());
+  const [savedKeys, setSavedKeys] = useState<Set<string>>(() => new Set());
+  const [pendingConfirm, setPendingConfirm] = useState<{
+    bookSlug: string;
+    heroId: string;
+    heroName: string;
+    snapshot: Progress;
+  } | null>(null);
+  const [savedModal, setSavedModal] = useState<{
+    heroName: string;
+    answered: Array<{ bookTitle: string; heroName: string }>;
+  } | null>(null);
   const aiSectionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const local = loadLocalProgress();
     const merged = mergeProgress(initialProgress, local);
     setProgress(merged);
+    const initialSaved = new Set<string>();
     if (initialProgress) {
       for (const key of Object.keys(initialProgress.guesses)) {
         if (
@@ -224,10 +235,11 @@ export function QuizApp({
             initialProgress.bfiAnswers[key],
           )
         ) {
-          savedKeysRef.current.add(key);
+          initialSaved.add(key);
         }
       }
     }
+    setSavedKeys(initialSaved);
     setHydrated(true);
   }, [initialProgress]);
 
@@ -243,23 +255,39 @@ export function QuizApp({
   );
 
   const totalDone = allHeroes.filter(({ bookSlug, hero }) =>
-    isHeroDone(bookSlug, hero.id, progress.guesses, progress.bfiAnswers),
+    savedKeys.has(heroKey(bookSlug, hero.id)),
   ).length;
 
   const bookDoneCount = book
-    ? book.heroes.filter((h) =>
-        isHeroDone(book.slug, h.id, progress.guesses, progress.bfiAnswers),
-      ).length
+    ? book.heroes.filter((h) => savedKeys.has(heroKey(book.slug, h.id))).length
     : 0;
   const bookTotal = book?.heroes.length ?? 0;
   const bookPct = bookTotal ? (bookDoneCount / bookTotal) * 100 : 0;
   const revealed = book ? !!progress.aiRevealed[book.slug] : false;
 
-  async function persistHero(bookSlug: string, heroId: string, next: Progress) {
+  function answeredList(keys: Set<string>) {
+    return allHeroes
+      .filter(({ bookSlug, hero }) => keys.has(heroKey(bookSlug, hero.id)))
+      .map(({ bookSlug, hero }) => {
+        const b = books.find((x) => x.slug === bookSlug)!;
+        return {
+          bookTitle: locale === "ru" ? b.titleRu : b.titleEn,
+          heroName: locale === "ru" ? hero.nameRu : hero.nameEn,
+        };
+      });
+  }
+
+  async function persistHero(
+    bookSlug: string,
+    heroId: string,
+    heroName: string,
+    next: Progress,
+  ) {
     const key = heroKey(bookSlug, heroId);
     const guess = next.guesses[key];
     const bfi = next.bfiAnswers[key];
     if (!isHeroAnswerComplete(guess, bfi) || !isFullBfi(bfi)) return;
+    if (savedKeys.has(key)) return;
 
     setSaveState("saving");
     setSaveError("");
@@ -286,8 +314,14 @@ export function QuizApp({
         setSaveError(data.error || t.saveError);
         return;
       }
-      savedKeysRef.current.add(key);
+      const nextSaved = new Set(savedKeys);
+      nextSaved.add(key);
+      setSavedKeys(nextSaved);
       setSaveState("saved");
+      setSavedModal({
+        heroName,
+        answered: answeredList(nextSaved),
+      });
       if (data.completed) {
         localStorage.removeItem(STORAGE_KEY);
         setCompleted(true);
@@ -298,22 +332,34 @@ export function QuizApp({
     }
   }
 
+  function requestSave(bookSlug: string, heroId: string, next: Progress) {
+    const key = heroKey(bookSlug, heroId);
+    if (savedKeys.has(key)) return;
+    if (!isHeroDone(bookSlug, heroId, next.guesses, next.bfiAnswers)) return;
+    const b = books.find((x) => x.slug === bookSlug);
+    const h = b?.heroes.find((x) => x.id === heroId);
+    if (!b || !h) return;
+    setPendingConfirm({
+      bookSlug,
+      heroId,
+      heroName: locale === "ru" ? h.nameRu : h.nameEn,
+      snapshot: next,
+    });
+  }
+
   function updateProgress(
     bookSlug: string,
     heroId: string,
     updater: (prev: Progress) => Progress,
   ) {
+    const key = heroKey(bookSlug, heroId);
+    if (savedKeys.has(key)) return;
     setProgress((prev) => {
       const next = updater(prev);
-      const key = heroKey(bookSlug, heroId);
       const wasDone = isHeroDone(bookSlug, heroId, prev.guesses, prev.bfiAnswers);
       const nowDone = isHeroDone(bookSlug, heroId, next.guesses, next.bfiAnswers);
-      const changed =
-        prev.guesses[key] !== next.guesses[key] ||
-        JSON.stringify(prev.bfiAnswers[key] || {}) !==
-          JSON.stringify(next.bfiAnswers[key] || {});
-      if (nowDone && (!wasDone || changed)) {
-        void persistHero(bookSlug, heroId, next);
+      if (nowDone && !wasDone) {
+        queueMicrotask(() => requestSave(bookSlug, heroId, next));
       }
       return next;
     });
@@ -370,6 +416,12 @@ export function QuizApp({
   const bfi = key ? progress.bfiAnswers[key] || {} : {};
   const bfiDone = isFullBfi(bfi);
   const axisLabels = AXES_KEYS.map((k) => t[k]);
+  const heroLocked = Boolean(key && savedKeys.has(key));
+  // For AI reveal, book is complete when all heroes are saved
+  const bookFullySaved =
+    book.heroes.length > 0 &&
+    book.heroes.every((h) => savedKeys.has(heroKey(book.slug, h.id)));
+  const bookRevealReady = bookFullySaved || bookDoneCount === bookTotal;
 
   return (
     <div className="app">
@@ -383,11 +435,8 @@ export function QuizApp({
 
       <p className="autosave-note">
         {t.progressSaved}
-        {saveState === "saving"
-          ? ` · ${t.saving}`
-          : saveState === "saved"
-            ? ` · ${t.saved} (${totalDone}/${allHeroes.length})`
-            : ` · ${totalDone}/${allHeroes.length}`}
+        {` · ${t.answeredCount}: ${totalDone}/${allHeroes.length}`}
+        {saveState === "saving" ? ` · ${t.saving}` : ""}
       </p>
       {saveError && <p className="interest-msg error">{saveError}</p>}
 
@@ -416,15 +465,17 @@ export function QuizApp({
 
       <div className="hero-grid">
         {book.heroes.map((h, i) => {
-          const done = isHeroDone(book.slug, h.id, progress.guesses, progress.bfiAnswers);
+          const locked = savedKeys.has(heroKey(book.slug, h.id));
+          const done = locked || isHeroDone(book.slug, h.id, progress.guesses, progress.bfiAnswers);
           return (
             <button
               key={h.id}
               type="button"
-              className={`hero-chip${i === currentHero ? " active" : ""}${done ? " done" : ""}`}
+              className={`hero-chip${i === currentHero ? " active" : ""}${done ? " done" : ""}${locked ? " locked" : ""}`}
               onClick={() => setCurrentHero(i)}
+              title={locked ? t.lockedHero : undefined}
             >
-              {(locale === "ru" ? h.nameRu : h.nameEn) + (done ? " ✓" : "")}
+              {(locale === "ru" ? h.nameRu : h.nameEn) + (locked ? " ✓" : done ? " ·" : "")}
             </button>
           );
         })}
@@ -439,6 +490,7 @@ export function QuizApp({
             <div className="hero-subtitle">
               {locale === "ru" ? book.titleRu : book.titleEn}
             </div>
+            {heroLocked && <p className="locked-banner">{t.lockedHero}</p>}
 
             <div className="question">{t.step1}</div>
             <div className="choice-row">
@@ -448,6 +500,7 @@ export function QuizApp({
                   type="button"
                   className={`choice-btn${guess === gid ? " picked" : ""}`}
                   data-group={gid}
+                  disabled={heroLocked}
                   onClick={() => setGuess(book.slug, hero.id, gid)}
                 >
                   <span>
@@ -489,6 +542,7 @@ export function QuizApp({
                     <button
                       type="button"
                       className={`bfi-btn yes${bfi[qq.id] === true ? " on" : ""}`}
+                      disabled={heroLocked}
                       onClick={() => setBfi(book.slug, hero.id, qq.id, true)}
                     >
                       {t.yes}
@@ -496,6 +550,7 @@ export function QuizApp({
                     <button
                       type="button"
                       className={`bfi-btn no${bfi[qq.id] === false ? " on" : ""}`}
+                      disabled={heroLocked}
                       onClick={() => setBfi(book.slug, hero.id, qq.id, false)}
                     >
                       {t.no}
@@ -524,7 +579,24 @@ export function QuizApp({
             </div>
 
             {guess && bfiDone ? (
-              <div className="verdict">{t.ready}</div>
+              <div className="verdict">
+                {heroLocked ? (
+                  t.lockedHero
+                ) : (
+                  <>
+                    {t.ready}
+                    <div style={{ marginTop: 12 }}>
+                      <button
+                        type="button"
+                        className="submit-btn"
+                        onClick={() => requestSave(book.slug, hero.id, progress)}
+                      >
+                        {t.confirmSaveYes}
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
             ) : guess && !bfiDone ? (
               <div className="verdict warn">
                 {t.bfiLeft}: {5 - Object.keys(bfi).length} {t.of} 5
@@ -538,9 +610,9 @@ export function QuizApp({
         <button
           type="button"
           className="reveal-btn"
-          disabled={bookDoneCount !== bookTotal}
+          disabled={!bookRevealReady}
           onClick={() => {
-            if (bookDoneCount !== bookTotal) return;
+            if (!bookRevealReady) return;
             setProgress((p) => ({
               ...p,
               aiRevealed: { ...p.aiRevealed, [book.slug]: !revealed },
@@ -553,7 +625,7 @@ export function QuizApp({
             }
           }}
         >
-          {bookDoneCount !== bookTotal
+          {!bookRevealReady
             ? `${t.revealLocked} ${bookTotal - bookDoneCount})`
             : revealed
               ? t.hide
@@ -633,6 +705,75 @@ export function QuizApp({
       </div>
 
       <div className="footer">{t.footer}</div>
+
+      {pendingConfirm && (
+        <div className="modal-backdrop" role="dialog" aria-modal="true">
+          <div className="modal-card">
+            <h2>{t.confirmSaveTitle}</h2>
+            <p>
+              <b>{pendingConfirm.heroName}</b>
+              <br />
+              {t.confirmSaveBody}
+            </p>
+            <div className="modal-actions">
+              <button
+                type="button"
+                className="ghost"
+                onClick={() => setPendingConfirm(null)}
+              >
+                {t.confirmSaveNo}
+              </button>
+              <button
+                type="button"
+                className="primary"
+                disabled={saveState === "saving"}
+                onClick={() => {
+                  const pending = pendingConfirm;
+                  setPendingConfirm(null);
+                  void persistHero(
+                    pending.bookSlug,
+                    pending.heroId,
+                    pending.heroName,
+                    pending.snapshot,
+                  );
+                }}
+              >
+                {saveState === "saving" ? t.saving : t.confirmSaveYes}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {savedModal && !completed && (
+        <div className="modal-backdrop" role="dialog" aria-modal="true">
+          <div className="modal-card">
+            <h2>{t.answerSavedTitle}</h2>
+            <p>
+              <b>{savedModal.heroName}</b>
+              <br />
+              {t.answerSavedBody}
+            </p>
+            <ul className="modal-hero-list">
+              {savedModal.answered.map((item) => (
+                <li key={`${item.bookTitle}-${item.heroName}`}>
+                  <span>✓ {item.heroName}</span>
+                  <span className="book">{item.bookTitle}</span>
+                </li>
+              ))}
+            </ul>
+            <div className="modal-actions">
+              <button
+                type="button"
+                className="primary"
+                onClick={() => setSavedModal(null)}
+              >
+                {t.continueBtn}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
