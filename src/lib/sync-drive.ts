@@ -1,6 +1,7 @@
 import { prisma } from "./prisma";
 import {
   downloadDriveFile,
+  getDriveAuth,
   isDriveConfigured,
   isSupportedBookFile,
   listDriveFolderFiles,
@@ -20,13 +21,7 @@ export type SyncResult = {
 };
 
 async function exportGoogleDocAsDocx(fileId: string): Promise<Buffer> {
-  const email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL!;
-  const key = process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY!.replace(/\\n/g, "\n");
-  const auth = new google.auth.JWT({
-    email,
-    key,
-    scopes: ["https://www.googleapis.com/auth/drive.readonly"],
-  });
+  const auth = getDriveAuth();
   const drive = google.drive({ version: "v3", auth });
   const res = await drive.files.export(
     {

@@ -14,10 +14,12 @@
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",
     "db:setup": "prisma migrate dev --name init && tsx prisma/seed.ts",
-    "sync:drive": "tsx scripts/sync-drive.ts"
+    "sync:drive": "tsx scripts/sync-drive.ts",
+    "drive:creds": "tsx scripts/apply-drive-credentials.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
+    "dotenv": "^17.4.2",
     "googleapis": "^178.0.0",
     "mammoth": "^1.12.3",
     "next": "^15.5.25",

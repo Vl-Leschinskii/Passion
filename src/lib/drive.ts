@@ -1,4 +1,6 @@
+import { readFileSync, existsSync } from "fs";
 import { google } from "googleapis";
+import type { JWTInput } from "google-auth-library";
 import { SEED_BOOKS } from "@/data/seed-books";
 
 export type DriveListedFile = {
@@ -8,27 +10,77 @@ export type DriveListedFile = {
   modifiedTime?: string | null;
 };
 
-function getAuth() {
+type ServiceAccountCreds = {
+  client_email: string;
+  private_key: string;
+};
+
+function loadServiceAccount(): ServiceAccountCreds {
+  const jsonPath =
+    process.env.GOOGLE_APPLICATION_CREDENTIALS ||
+    process.env.GOOGLE_SERVICE_ACCOUNT_JSON_PATH ||
+    "";
+  if (jsonPath && existsSync(jsonPath)) {
+    const raw = JSON.parse(readFileSync(jsonPath, "utf8")) as JWTInput & {
+      client_email?: string;
+      private_key?: string;
+    };
+    if (!raw.client_email || !raw.private_key) {
+      throw new Error(`Invalid service account JSON at ${jsonPath}`);
+    }
+    return { client_email: raw.client_email, private_key: raw.private_key };
+  }
+
+  const inlineJson = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
+  if (inlineJson) {
+    const raw = JSON.parse(inlineJson) as { client_email?: string; private_key?: string };
+    if (!raw.client_email || !raw.private_key) {
+      throw new Error("GOOGLE_SERVICE_ACCOUNT_JSON is missing client_email/private_key");
+    }
+    return { client_email: raw.client_email, private_key: raw.private_key };
+  }
+
   const email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
   const key = process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY?.replace(/\\n/g, "\n");
-  if (!email || !key) {
-    throw new Error(
-      "Google Drive is not configured. Set GOOGLE_SERVICE_ACCOUNT_EMAIL and GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY.",
-    );
+  if (email && key) {
+    return { client_email: email, private_key: key };
   }
+
+  throw new Error(
+    "Google Drive is not configured. Put the service-account JSON at secrets/google-sa.json " +
+      "or set GOOGLE_SERVICE_ACCOUNT_EMAIL + GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY.",
+  );
+}
+
+function getAuth() {
+  const creds = loadServiceAccount();
   return new google.auth.JWT({
-    email,
-    key,
+    email: creds.client_email,
+    key: creds.private_key,
     scopes: ["https://www.googleapis.com/auth/drive.readonly"],
   });
 }
 
+export function getDriveAuth() {
+  return getAuth();
+}
+
 export function isDriveConfigured() {
-  return Boolean(
-    process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL &&
-      process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY &&
-      process.env.GOOGLE_DRIVE_FOLDER_ID,
-  );
+  try {
+    if (!process.env.GOOGLE_DRIVE_FOLDER_ID) return false;
+    loadServiceAccount();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export function getDriveServiceAccountEmail(): string | null {
+  try {
+    return loadServiceAccount().client_email;
+  } catch {
+    return null;
+  }
 }
 
 export async function listDriveFolderFiles(): Promise<DriveListedFile[]> {

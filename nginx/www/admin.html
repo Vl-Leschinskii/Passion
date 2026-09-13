@@ -136,6 +136,32 @@
     </div>
 
     <div class="card">
+      <h3 style="margin-bottom:8px">Книги для анализа</h3>
+      <p class="muted" style="margin-bottom:14px">Загрузите .doc / .docx / .pdf, затем нажмите «Разобрать» (нужен OPENAI_API_KEY).</p>
+      <div class="row" style="margin-bottom:14px; align-items:center">
+        <input id="bookFile" type="file" accept=".doc,.docx,.pdf,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style="margin:0; max-width:320px" />
+        <button type="button" class="good" id="uploadBtn">Загрузить</button>
+      </div>
+      <p class="err" id="uploadErr"></p>
+      <p class="ok" id="uploadOk"></p>
+      <div style="overflow:auto; max-height:420px">
+        <table>
+          <thead>
+            <tr>
+              <th>Файл</th>
+              <th>Размер</th>
+              <th>Загружен</th>
+              <th>Статус</th>
+              <th>Книга</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="uploads"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
       <h3 style="margin-bottom:12px">Типы по Гумилёву (все ответы)</h3>
       <div id="guesses"></div>
     </div>
@@ -240,6 +266,8 @@ async function loadStats() {
     </tr>
   `).join('') || '<tr><td colspan="5" class="muted">Пока никто не оставил e-mail</td></tr>';
 
+  await loadUploads();
+
   const gt = data.guessTotals;
   const gTotal = (gt.passi||0)+(gt.garm||0)+(gt.sub||0) || 1;
   document.getElementById('guesses').innerHTML = ['passi','garm','sub'].map(k => {
@@ -279,6 +307,111 @@ async function loadStats() {
       <td class="muted">${a.respondentId.slice(0,8)}…</td>
     </tr>`;
   }).join('') || '<tr><td colspan="5" class="muted">Пока нет ответов</td></tr>';
+}
+
+const STATUS_LABEL = {
+  pending: 'ожидает',
+  processing: 'разбор…',
+  done: 'готово',
+  error: 'ошибка',
+};
+
+function fmtSize(n) {
+  if (n < 1024) return n + ' B';
+  if (n < 1024 * 1024) return (n / 1024).toFixed(1) + ' KB';
+  return (n / (1024 * 1024)).toFixed(1) + ' MB';
+}
+
+async function loadUploads() {
+  const res = await api('/uploads');
+  const tbody = document.getElementById('uploads');
+  if (!res.ok) {
+    tbody.innerHTML = '<tr><td colspan="6" class="err">Не удалось загрузить список</td></tr>';
+    return;
+  }
+  const data = await res.json();
+  tbody.innerHTML = (data.files || []).map(f => {
+    const status = STATUS_LABEL[f.status] || f.status;
+    const book = f.bookSlug
+      ? `${f.titleRu || f.bookSlug}<div class="muted">${f.bookSlug}</div>`
+      : (f.error ? `<span class="err">${f.error}</span>` : '—');
+    const canAnalyze = f.status !== 'done' && f.status !== 'processing';
+    return `<tr data-name="${encodeURIComponent(f.name)}">
+      <td>${f.name}</td>
+      <td>${fmtSize(f.size)}</td>
+      <td>${new Date(f.mtime).toLocaleString('ru-RU')}</td>
+      <td>${status}</td>
+      <td>${book}</td>
+      <td class="row">
+        <button type="button" class="good" data-analyze="${encodeURIComponent(f.name)}" ${canAnalyze ? '' : 'disabled'}>Разобрать</button>
+        <button type="button" class="ghost" data-del="${encodeURIComponent(f.name)}">Удалить</button>
+      </td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="6" class="muted">Файлов пока нет</td></tr>';
+
+  tbody.querySelectorAll('[data-analyze]').forEach(btn => {
+    btn.onclick = () => analyzeUpload(decodeURIComponent(btn.getAttribute('data-analyze')));
+  });
+  tbody.querySelectorAll('[data-del]').forEach(btn => {
+    btn.onclick = () => deleteUpload(decodeURIComponent(btn.getAttribute('data-del')));
+  });
+}
+
+document.getElementById('uploadBtn').onclick = async () => {
+  const err = document.getElementById('uploadErr');
+  const ok = document.getElementById('uploadOk');
+  err.textContent = '';
+  ok.textContent = '';
+  const input = document.getElementById('bookFile');
+  if (!input.files || !input.files[0]) {
+    err.textContent = 'Выберите файл';
+    return;
+  }
+  const fd = new FormData();
+  fd.append('file', input.files[0]);
+  const res = await api('/uploads', { method: 'POST', body: fd });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    err.textContent = data.error || 'Ошибка загрузки';
+    return;
+  }
+  ok.textContent = 'Загружено: ' + data.file.name;
+  input.value = '';
+  await loadUploads();
+};
+
+async function analyzeUpload(name) {
+  const err = document.getElementById('uploadErr');
+  const ok = document.getElementById('uploadOk');
+  err.textContent = '';
+  ok.textContent = 'Разбор «' + name + '»… это может занять минуту';
+  await loadUploads();
+  const res = await api('/uploads/analyze', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name }),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    err.textContent = data.error || 'Ошибка разбора';
+    ok.textContent = '';
+    await loadUploads();
+    return;
+  }
+  ok.textContent = `Готово: ${data.book.titleRu} (${data.book.heroesCount} героев, slug ${data.book.slug})`;
+  await loadUploads();
+}
+
+async function deleteUpload(name) {
+  if (!confirm('Удалить файл «' + name + '»?')) return;
+  const res = await api('/uploads?name=' + encodeURIComponent(name), { method: 'DELETE' });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    document.getElementById('uploadErr').textContent = data.error || 'Не удалось удалить';
+    return;
+  }
+  document.getElementById('uploadOk').textContent = 'Удалено: ' + name;
+  await loadUploads();
 }
 
 boot();

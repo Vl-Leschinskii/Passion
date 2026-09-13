@@ -5,8 +5,13 @@ node_modules
 .DS_Store
 prisma/*.db
 tmp
-uploads
+/uploads/
 tsconfig.tsbuildinfo
 
 # Self-signed TLS material (generate locally)
 nginx/certs/
+
+# Google service account keys
+secrets/*.json
+!secrets/.gitkeep
+

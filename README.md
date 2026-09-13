@@ -35,6 +35,8 @@ Allowlisted email (default `vleschinskii@gmail.com`) + `ADMIN_TOKEN` from `.env`
 - UI: [/passion/admin/](https://217.160.139.56/passion/admin/)
 - CSV export: `/passion/api/admin/export` (after login)
 - Configure emails: `ADMIN_EMAILS=a@x.com,b@y.com`
+- **Book upload:** `.doc` / `.docx` / `.pdf` → `uploads/books/` on the server
+- **Analyze:** button «Разобрать» runs LLM (`OPENAI_API_KEY` required) and publishes the book into the quiz
 
 Default DB URL: `postgresql://passion:passion@localhost:5433/passion`
 
@@ -63,29 +65,26 @@ Nginx proxies:
 
 Folder: [книги](https://drive.google.com/drive/folders/1TGz0X3YM1D15mATN1Iwh-BywJA4WVYWj)
 
-1. Create a Google Cloud **service account**.
-2. Share the Drive folder with that SA email (Viewer).
-3. Put credentials in `.env`:
+### One-time credentials setup
 
-```env
-GOOGLE_DRIVE_FOLDER_ID=1TGz0X3YM1D15mATN1Iwh-BywJA4WVYWj
-GOOGLE_SERVICE_ACCOUNT_EMAIL=...
-GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
-OPENAI_API_KEY=...
-OPENAI_MODEL=gpt-4o-mini
-```
-
-Sync endpoints:
+1. In [Google Cloud Console](https://console.cloud.google.com/) create a project (or pick one).
+2. Enable **Google Drive API**.
+3. **IAM → Service Accounts → Create** → create a key (**JSON**).
+4. On this server:
 
 ```bash
-# cron / scheduler
-curl -H "Authorization: Bearer $CRON_SECRET" http://localhost:3010/api/cron/sync-drive
+cd ~/passion
+npx tsx scripts/apply-drive-credentials.ts /path/to/downloaded-sa.json
+```
 
-# manual admin
-curl -X POST -H "x-admin-token: $ADMIN_TOKEN" http://localhost:3010/api/admin/sync-drive
+5. Share the Drive folder with the printed `...@....iam.gserviceaccount.com` email (**Viewer**).
+6. Set `OPENAI_API_KEY` in `.env` (needed to analyse **new** books).
+7. Restart Next and run:
 
-# CLI
+```bash
 npm run sync:drive
+# or:
+curl -X POST -H "x-admin-token: $ADMIN_TOKEN" http://localhost:3010/passion/api/admin/sync-drive
 ```
 
 Known seed books (Mitchell / Scott / Tolstoy) are **skipped** (already seeded). Any **new** `.doc` / `.docx` / `.pdf` is downloaded, text-extracted, analysed by the LLM into Gumilev type + BFI scores (−1…+1), and published for new respondents.

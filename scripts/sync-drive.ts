@@ -1,3 +1,6 @@
+import { config } from "dotenv";
+config({ path: ".env" });
+
 import { syncDriveBooks } from "../src/lib/sync-drive";
 
 syncDriveBooks()
