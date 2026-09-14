@@ -138,6 +138,23 @@ body {
   opacity: 0.9;
 }
 
+.hero-ai {
+  margin-top: 28px;
+}
+.hero-ai h3 {
+  text-align: center;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #e2c98a;
+  margin-bottom: 6px;
+}
+.hero-ai .note {
+  text-align: center;
+  font-size: 0.82rem;
+  opacity: 0.6;
+  margin-bottom: 16px;
+}
+
 .modal-backdrop {
   position: fixed;
   inset: 0;

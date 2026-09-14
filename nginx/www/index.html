@@ -442,6 +442,20 @@
   }
   .hero-chip.done::after { content: ' ✓'; color:#8fdccf; }
   .locked-note { text-align:center; color:#8fdccf; margin:10px 0 0; font-size:.9rem; }
+  .hero-ai { margin-top: 28px; }
+  .hero-ai h3 {
+    text-align: center;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #e2c98a;
+    margin-bottom: 6px;
+  }
+  .hero-ai p.note {
+    text-align: center;
+    font-size: 0.82rem;
+    opacity: 0.6;
+    margin-bottom: 16px;
+  }
   .save-row { text-align:center; margin-top:18px; }
   .save-btn {
     padding:14px 30px; border:0; border-radius:40px; cursor:pointer; font-weight:700;
@@ -591,7 +605,7 @@ const I18N = {
     bfiTitle:'Шкалы Big Five Inventory',
     bfiSub:'Что означают высокие и низкие значения',
     yes:'Да', no:'Нет',
-    ready:'✅ Готово. Можно сохранить ответ или дождаться оценки ИИ по всей книге.',
+    ready:'✅ Готово. Сохраните ответ — после этого откроется оценка ИИ по этому герою.',
     left:'⚠️ Осталось ответить на BFI-вопросы: {n} из 5.',
     save:'Сохранить ответ',
     locked:'Ответ по этому герою уже сохранён',
@@ -599,7 +613,9 @@ const I18N = {
     confirmBody:'Ответ будет записан в базу. Изменить его потом нельзя.',
     cancel:'Отмена',
     savedTitle:'Ответ сохранён',
-    savedBody:'Вы уже ответили по следующим героям:',
+    savedBody:'Ответ записан. Ниже можно сравнить его с оценкой ИИ. Вы уже ответили по героям:',
+    heroAiTitle:'📊 Оценка ИИ по этому герою',
+    heroAiNote:'Тип по Гумилёву и профиль BFI — сравните со своим ответом.',
     cont:'Продолжить',
     revealLock:'🔒 Показать оценку ИИ по BFI (осталось {n})',
     revealShow:'🔓 Показать оценку ИИ по BFI',
@@ -631,7 +647,7 @@ const I18N = {
     bfiTitle:'Big Five Inventory scales',
     bfiSub:'What high and low scores mean',
     yes:'Yes', no:'No',
-    ready:'✅ Done. You can save the answer or wait for the book-level AI reveal.',
+    ready:'✅ Done. Save the answer to see the AI estimate for this hero.',
     left:'⚠️ BFI answers left: {n} of 5.',
     save:'Save answer',
     locked:'This hero answer is already saved',
@@ -639,7 +655,9 @@ const I18N = {
     confirmBody:'It will be written to the database and cannot be changed later.',
     cancel:'Cancel',
     savedTitle:'Answer saved',
-    savedBody:'You already answered these heroes:',
+    savedBody:'Saved. You can now compare it with the AI estimate. You already answered:',
+    heroAiTitle:'📊 AI estimate for this hero',
+    heroAiNote:'Gumilev type and BFI profile — compare with your answer.',
     cont:'Continue',
     revealLock:'🔒 Show AI BFI estimate ({n} left)',
     revealShow:'🔓 Show AI BFI estimate',
@@ -812,8 +830,8 @@ function renderWorkspace() {
   const bfiCount = ['O','C','E','A','N'].filter(a => typeof bfi[a]==='boolean').length;
 
   let verdict = '';
-  if (guess && bfiCount === 5) verdict = `<div class="verdict">${t().ready}</div>`;
-  else if (guess) verdict = `<div class="verdict warn">${t().left.replace('{n}', String(5-bfiCount))}</div>`;
+  if (!locked && guess && bfiCount === 5) verdict = `<div class="verdict">${t().ready}</div>`;
+  else if (!locked && guess) verdict = `<div class="verdict warn">${t().left.replace('{n}', String(5-bfiCount))}</div>`;
 
   ws.innerHTML = `
     <div class="hero-title">${heroName(hero)}</div>
@@ -863,7 +881,11 @@ function renderWorkspace() {
     </div>
     ${verdict}
     ${(!locked && isDone(book.slug, hero.id)) ? `<div class="save-row"><button type="button" class="save-btn" id="saveBtn">${t().save}</button></div>` : ''}
+    ${locked ? `<div class="hero-ai" id="heroAi"><h3>${t().heroAiTitle}</h3><p class="note">${t().heroAiNote}</p></div>` : ''}
     <p id="saveErr" class="err"></p>`;
+
+  const heroAi = document.getElementById('heroAi');
+  if (heroAi) appendAiCard(heroAi, hero, true);
 
   ws.querySelectorAll('[data-group]').forEach(btn => btn.onclick = () => {
     progress.guesses[k] = btn.dataset.group;
@@ -905,29 +927,26 @@ function renderBottomAction() {
   el.appendChild(btn);
 }
 
-function renderAISection() {
-  const ai = document.getElementById('aiSection');
+function userMarkFor(hero) {
   const book = books[bookIdx];
-  if (!aiRevealed[book.slug]) { ai.classList.remove('open'); ai.innerHTML=''; return; }
-  ai.classList.add('open');
+  const userGuess = progress.guesses[key(book.slug, hero.id)];
+  const meta = gm();
+  if (userGuess && userGuess !== hero.group) return `${t().yourChoice}${meta[userGuess]?.emoji || ''}`;
+  if (userGuess) return t().matched;
+  return '';
+}
+
+function appendAiCard(parent, hero, expanded) {
   const axes = AXES[locale];
   const meta = gm();
-  ai.innerHTML = `
-    <h2>${t().aiTitle.replace('{book}', bookTitle(book))}</h2>
-    <p class="note">${t().aiNote}</p>`;
-  book.heroes.forEach((hero) => {
-    const k = key(book.slug, hero.id);
-    const userGuess = progress.guesses[k];
-    let userMark = '';
-    if (userGuess && userGuess !== hero.group) userMark = `${t().yourChoice}${meta[userGuess]?.emoji || ''}`;
-    else if (userGuess) userMark = t().matched;
-    const scores = Array.isArray(hero.scores) ? hero.scores : [0,0,0,0,0];
-    const g = hero.group in meta ? hero.group : 'garm';
-    const card = document.createElement('div');
-    card.className = 'ai-card';
-    card.innerHTML = `
+  const scores = Array.isArray(hero.scores) ? hero.scores : [0,0,0,0,0];
+  const g = hero.group in meta ? hero.group : 'garm';
+  const poleId = `pole-${hero.id}-${Math.random().toString(36).slice(2, 8)}`;
+  const card = document.createElement('div');
+  card.className = 'ai-card' + (expanded ? ' expanded' : '');
+  card.innerHTML = `
       <div class="ai-card-head">
-        <div class="ai-card-name">${heroName(hero)}${userMark}</div>
+        <div class="ai-card-name">${heroName(hero)}${userMarkFor(hero)}</div>
         <div class="ai-card-tag ${g}">${meta[g].emoji} ${meta[g].label}</div>
         <div class="ai-card-toggle">▼</div>
       </div>
@@ -942,24 +961,33 @@ function renderAISection() {
                 return `<div class="ai-axis-row"><span>${axis}</span><b style="color:${color}">${v.toFixed(1)}</b></div>`;
               }).join('')}
             </div>
-            <div class="ai-pole" id="pole-${hero.id}"></div>
+            <div class="ai-pole" id="${poleId}"></div>
           </div>
           <div><canvas class="radar-mini" width="640" height="640" data-scores='${JSON.stringify(scores)}'></canvas></div>
         </div>
       </div>`;
-    const high=[], low=[];
-    axes.forEach((ax,i) => {
-      const v = Number(scores[i]||0);
-      if (v > 0.3) high.push(ax.toLowerCase());
-      else if (v < -0.3) low.push(ax.toLowerCase());
-    });
-    card.querySelector(`#pole-${hero.id}`).innerHTML =
-      `<b>${t().profile}</b> ${high.length?`${t().high} ${high.join(', ')}.` : ''} ${low.length?`${t().low} ${low.join(', ')}.` : ''}`;
-    card.querySelector('.ai-card-head').onclick = () => card.classList.toggle('expanded');
-    ai.appendChild(card);
-    const cnv = card.querySelector('canvas');
-    drawRadar(cnv, scores);
+  const high=[], low=[];
+  axes.forEach((ax,i) => {
+    const v = Number(scores[i]||0);
+    if (v > 0.3) high.push(ax.toLowerCase());
+    else if (v < -0.3) low.push(ax.toLowerCase());
   });
+  card.querySelector(`#${poleId}`).innerHTML =
+    `<b>${t().profile}</b> ${high.length?`${t().high} ${high.join(', ')}.` : ''} ${low.length?`${t().low} ${low.join(', ')}.` : ''}`;
+  card.querySelector('.ai-card-head').onclick = () => card.classList.toggle('expanded');
+  parent.appendChild(card);
+  drawRadar(card.querySelector('canvas'), scores);
+}
+
+function renderAISection() {
+  const ai = document.getElementById('aiSection');
+  const book = books[bookIdx];
+  if (!aiRevealed[book.slug]) { ai.classList.remove('open'); ai.innerHTML=''; return; }
+  ai.classList.add('open');
+  ai.innerHTML = `
+    <h2>${t().aiTitle.replace('{book}', bookTitle(book))}</h2>
+    <p class="note">${t().aiNote}</p>`;
+  book.heroes.forEach((hero) => appendAiCard(ai, hero, false));
 }
 
 function drawRadar(canvas, scores) {
@@ -1053,7 +1081,11 @@ function showModal() {
       <ul>${list}</ul>
       <div class="btns"><button class="primary" id="mCont">${t().cont}</button></div>
     </div></div>`;
-    document.getElementById('mCont').onclick = () => { modal=null; render(); };
+    document.getElementById('mCont').onclick = () => {
+      modal=null;
+      render();
+      setTimeout(() => document.getElementById('heroAi')?.scrollIntoView({behavior:'smooth', block:'start'}), 50);
+    };
   }
 }
 async function doSave() {

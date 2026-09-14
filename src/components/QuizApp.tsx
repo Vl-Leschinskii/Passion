@@ -176,6 +176,76 @@ function Radar({ scores, labels }: { scores: number[]; labels: string[] }) {
   return <canvas ref={ref} className="radar-mini" width={640} height={640} />;
 }
 
+function HeroAiCard({
+  hero,
+  userGuess,
+  locale,
+  t,
+  axisLabels,
+  defaultOpen = false,
+}: {
+  hero: ApiHero;
+  userGuess?: GumilevGroup;
+  locale: Locale;
+  t: (typeof translations)["ru"];
+  axisLabels: string[];
+  defaultOpen?: boolean;
+}) {
+  let userMark = "";
+  if (userGuess && userGuess !== hero.group) {
+    userMark = ` · ${t.yourChoice}: ${GROUP_META[userGuess].emoji}`;
+  } else if (userGuess) {
+    userMark = ` · ${t.matched} ✓`;
+  }
+  const meta = GROUP_META[hero.group as keyof typeof GROUP_META];
+  const high: string[] = [];
+  const low: string[] = [];
+  axisLabels.forEach((ax, i) => {
+    const v = hero.scores[i] ?? 0;
+    if (v > 0.3) high.push(ax.toLowerCase());
+    else if (v < -0.3) low.push(ax.toLowerCase());
+  });
+  return (
+    <details className="ai-card" open={defaultOpen}>
+      <summary className="ai-card-head">
+        <div className="ai-card-name">
+          {(locale === "ru" ? hero.nameRu : hero.nameEn) + userMark}
+        </div>
+        <div className={`ai-card-tag ${hero.group}`}>
+          {meta.emoji} {t[hero.group as keyof typeof t]}
+        </div>
+      </summary>
+      <div className="ai-card-body">
+        <div className="ai-card-grid">
+          <div>
+            <div className="ai-desc">{locale === "ru" ? hero.descRu : hero.descEn}</div>
+            <div className="ai-axis-list">
+              {axisLabels.map((axis, i) => {
+                const v = hero.scores[i] ?? 0;
+                const color = v > 0.3 ? "#f7cd84" : v < -0.3 ? "#d6a8c4" : "#8fdccf";
+                return (
+                  <div key={axis} className="ai-axis-row">
+                    <span>{axis}</span>
+                    <b style={{ color }}>{v.toFixed(1)}</b>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="ai-pole">
+              <b>{t.profile}:</b>{" "}
+              {high.length ? `${t.expressed} — ${high.join(", ")}.` : ""}{" "}
+              {low.length ? `${t.reduced} — ${low.join(", ")}.` : ""}
+            </div>
+          </div>
+          <div>
+            <Radar scores={hero.scores} labels={axisLabels} />
+          </div>
+        </div>
+      </div>
+    </details>
+  );
+}
+
 function isHeroDone(
   bookSlug: string,
   heroId: string,
@@ -602,6 +672,21 @@ export function QuizApp({
                 {t.bfiLeft}: {5 - Object.keys(bfi).length} {t.of} 5
               </div>
             ) : null}
+
+            {heroLocked && (
+              <div className="hero-ai" id="heroAi">
+                <h3>{t.heroAiTitle}</h3>
+                <p className="note">{t.heroAiNote}</p>
+                <HeroAiCard
+                  hero={hero}
+                  userGuess={guess}
+                  locale={locale}
+                  t={t}
+                  axisLabels={axisLabels}
+                  defaultOpen
+                />
+              </div>
+            )}
           </>
         )}
       </div>
@@ -640,66 +725,16 @@ export function QuizApp({
               {t.aiTitle} · {locale === "ru" ? book.titleRu : book.titleEn}
             </h2>
             <p className="note">{t.aiNote}</p>
-            {book.heroes.map((h) => {
-              const hk = heroKey(book.slug, h.id);
-              const userGuess = progress.guesses[hk];
-              let userMark = "";
-              if (userGuess && userGuess !== h.group) {
-                userMark = ` · ${t.yourChoice}: ${GROUP_META[userGuess].emoji}`;
-              } else if (userGuess) {
-                userMark = ` · ${t.matched} ✓`;
-              }
-              const meta = GROUP_META[h.group as keyof typeof GROUP_META];
-              const high: string[] = [];
-              const low: string[] = [];
-              axisLabels.forEach((ax, i) => {
-                const v = h.scores[i] ?? 0;
-                if (v > 0.3) high.push(ax.toLowerCase());
-                else if (v < -0.3) low.push(ax.toLowerCase());
-              });
-              return (
-                <details key={h.id} className="ai-card">
-                  <summary className="ai-card-head">
-                    <div className="ai-card-name">
-                      {(locale === "ru" ? h.nameRu : h.nameEn) + userMark}
-                    </div>
-                    <div className={`ai-card-tag ${h.group}`}>
-                      {meta.emoji} {t[h.group as keyof typeof t]}
-                    </div>
-                  </summary>
-                  <div className="ai-card-body">
-                    <div className="ai-card-grid">
-                      <div>
-                        <div className="ai-desc">
-                          {locale === "ru" ? h.descRu : h.descEn}
-                        </div>
-                        <div className="ai-axis-list">
-                          {axisLabels.map((axis, i) => {
-                            const v = h.scores[i] ?? 0;
-                            const color =
-                              v > 0.3 ? "#f7cd84" : v < -0.3 ? "#d6a8c4" : "#8fdccf";
-                            return (
-                              <div key={axis} className="ai-axis-row">
-                                <span>{axis}</span>
-                                <b style={{ color }}>{v.toFixed(1)}</b>
-                              </div>
-                            );
-                          })}
-                        </div>
-                        <div className="ai-pole">
-                          <b>{t.profile}:</b>{" "}
-                          {high.length ? `${t.expressed} — ${high.join(", ")}.` : ""}{" "}
-                          {low.length ? `${t.reduced} — ${low.join(", ")}.` : ""}
-                        </div>
-                      </div>
-                      <div>
-                        <Radar scores={h.scores} labels={axisLabels} />
-                      </div>
-                    </div>
-                  </div>
-                </details>
-              );
-            })}
+            {book.heroes.map((h) => (
+              <HeroAiCard
+                key={h.id}
+                hero={h}
+                userGuess={progress.guesses[heroKey(book.slug, h.id)]}
+                locale={locale}
+                t={t}
+                axisLabels={axisLabels}
+              />
+            ))}
           </>
         )}
       </div>
@@ -766,7 +801,17 @@ export function QuizApp({
               <button
                 type="button"
                 className="primary"
-                onClick={() => setSavedModal(null)}
+                onClick={() => {
+                  setSavedModal(null);
+                  setTimeout(
+                    () =>
+                      document.getElementById("heroAi")?.scrollIntoView({
+                        behavior: "smooth",
+                        block: "start",
+                      }),
+                    50,
+                  );
+                }}
               >
                 {t.continueBtn}
               </button>

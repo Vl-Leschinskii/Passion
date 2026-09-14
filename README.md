@@ -26,7 +26,7 @@ npm run dev
 
 Open [http://localhost:3010/passion](http://localhost:3010/passion) (direct) or via gateway [http://localhost/passion](http://localhost/passion).
 
-**Production URL on this server:** [http://217.160.139.56/passion](http://217.160.139.56/passion)
+**Production URL on this server:** [https://217.160.139.56/passion](https://217.160.139.56/passion)
 
 ### Admin stats (`/passion/admin`)
 

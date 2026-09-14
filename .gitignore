@@ -8,8 +8,10 @@ tmp
 /uploads/
 tsconfig.tsbuildinfo
 
-# Self-signed TLS material (generate locally)
+# TLS material
 nginx/certs/
+nginx/letsencrypt/
+nginx/acme/
 
 # Google service account keys
 secrets/*.json
