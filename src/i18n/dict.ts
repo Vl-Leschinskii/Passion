@@ -143,9 +143,9 @@ export const GROUP_META = {
   passi: {
     emoji: "⚡",
     fullRu:
-      "Люди с избытком «пассионарной энергии»: они ставят сверхцель выше самосохранения, ломают нормы и часто меняют ход истории — ценой своей жизни и жизней окружающих.",
+      "Люди с избытком энергии: они ставят сверхцель выше самосохранения, ломают нормы и часто меняют ход истории — ценой своей жизни и жизней окружающих.",
     fullEn:
-      "People with surplus passionary energy: they put a super-goal above self-preservation, break norms, and often change history — at a personal and social cost.",
+      "People with surplus energy: they put a super-goal above self-preservation, break norms, and often change history — at a personal and social cost.",
     exRu: "Примеры: Александр Македонский, Юлий Цезарь, Наполеон, Пётр I, Жанна д’Арк.",
     exEn: "Examples: Alexander the Great, Julius Caesar, Napoleon, Peter I, Joan of Arc.",
   },

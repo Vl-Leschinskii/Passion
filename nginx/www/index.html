@@ -30,9 +30,12 @@
   .brand p { font-size: 0.85rem; opacity: 0.55; margin-top: 6px; }
 
   /* ---------- BOOK TABS ---------- */
+  .book-picker { text-align: center; margin-bottom: 20px; }
+  .book-picker-label {
+    font-size: 0.85rem; opacity: 0.55; margin-bottom: 10px;
+  }
   .book-tabs {
     display: flex; justify-content: center; flex-wrap: wrap; gap: 10px;
-    margin-bottom: 20px;
   }
   .book-tabs button {
     background: rgba(255,255,255,0.06);
@@ -121,7 +124,7 @@
     color: #cfe0f0;
   }
 
-  /* ---------- TYPE INFO (Гумилёв) ---------- */
+  /* ---------- TYPE INFO ---------- */
   .types-block {
     margin: 26px 0 10px;
     padding: 20px 18px;
@@ -570,39 +573,40 @@ const BFI_QUESTIONS = {
 };
 const GROUP_META = {
   ru: {
-    passi: {label:'Пассионарий', emoji:'⚡', hint:'избыток энергии, сверхцель, ломка границ',
-      full:'Люди с избытком «пассионарной энергии»: они ставят сверхцель выше самосохранения, ломают нормы и часто меняют ход истории — ценой своей жизни и жизней окружающих. Импульс пассионарности может быть творческим или разрушительным.',
+    passi: {label:'Тип1', emoji:'⚡', hint:'избыток энергии, сверхцель, ломка границ',
+      full:'Люди с избытком энергии: они ставят сверхцель выше самосохранения, ломают нормы и часто меняют ход истории — ценой своей жизни и жизней окружающих. Энергетический импульс может быть творческим или разрушительным.',
       ex:'Примеры: Александр Македонский, Юлий Цезарь, Наполеон, Пётр I, Жанна д’Арк.'},
-    garm: {label:'Гармоничный (персистент)', emoji:'🌿', hint:'баланс энергии, основа социума',
+    garm: {label:'Тип2', emoji:'🌿', hint:'баланс энергии, основа социума',
       full:'Люди с нормальным, сбалансированным уровнем энергии. Они не рвутся к сверхцели, но и не лишены воли: добросовестны, ценят семью и традицию, создают блага и удерживают социальную ткань.',
       ex:'Примеры: Марк Аврелий, Эразм Роттердамский, В. А. Жуковский.'},
-    sub: {label:'Субпассионарий', emoji:'🔍', hint:'дефицит энергии, ведомость, инерция',
+    sub: {label:'Тип3', emoji:'🔍', hint:'дефицит энергии, ведомость, инерция',
       full:'Люди с пониженной энергетикой: не способны к длительному усилию, легко подчиняются более сильным, живут чужими идеями или прошлым. Могут быть умны и талантливы, но без внутреннего мотора для действия.',
       ex:'Примеры: Николай II в конце правления, Обломов, «лишние люди» русской литературы.'}
   },
   en: {
-    passi: {label:'Passionary', emoji:'⚡', hint:'surplus energy, super-goal, breaking norms',
-      full:'People with surplus “passionary energy”: they put a super-goal above self-preservation, break norms, and often change history — at a personal and social cost. The impulse can be creative or destructive.',
+    passi: {label:'Type1', emoji:'⚡', hint:'surplus energy, super-goal, breaking norms',
+      full:'People with surplus energy: they put a super-goal above self-preservation, break norms, and often change history — at a personal and social cost. The energy impulse can be creative or destructive.',
       ex:'Examples: Alexander the Great, Julius Caesar, Napoleon, Peter I, Joan of Arc.'},
-    garm: {label:'Harmonic (persistent)', emoji:'🌿', hint:'balanced energy, social fabric',
+    garm: {label:'Type2', emoji:'🌿', hint:'balanced energy, social fabric',
       full:'People with a balanced energy level. They do not chase a super-goal, yet are not will-less: conscientious, oriented to family and tradition, they sustain everyday social life.',
       ex:'Examples: Marcus Aurelius, Erasmus of Rotterdam, V. A. Zhukovsky.'},
-    sub: {label:'Subpassionary', emoji:'🔍', hint:'energy deficit, inertia, being led',
+    sub: {label:'Type3', emoji:'🔍', hint:'energy deficit, inertia, being led',
       full:'People with lowered energy: limited capacity for sustained effort, easily led by stronger wills, living by others’ ideas or the past. They may be intelligent, yet lack an inner drive to act.',
       ex:'Examples: late Nicholas II, Oblomov, “superfluous people” in Russian literature.'}
   }
 };
 const I18N = {
   ru: {
-    title:'🧭 Пассионарный тест героев · Big Five',
-    subtitle:'Оцените тип героя по Гумилёву, отметьте признаки BFI — и сравните с оценкой ИИ.',
+    title:'🧭 Оценка социальных типов литературных героев',
+    subtitle:'Оцените тип литературного героя — потом сравните с оценкой других читателей и ИИ',
+    pickBook:'Выберите книгу',
     pick:'Выберите героя, чтобы оценить его',
-    step1:'🤔 Шаг 1. К какому типу по Гумилёву вы отнесёте этого героя?',
-    step2:'🧠 Шаг 2. Какими признаками BFI, по вашему мнению, обладает герой?',
+    step1:'🤔 Шаг 1. К какому социальному типу вы отнесёте этого героя?',
+    step2:'🧠 Шаг 2. Какими еще коммуникативными признаками по вашему мнению, обладает герой?',
     step2note:'Отметьте «Да» или «Нет» по каждой из пяти шкал.',
-    typesTitle:'Типология по Гумилёву',
-    typesSub:'Краткие ориентиры перед выбором',
-    bfiTitle:'Шкалы Big Five Inventory',
+    typesTitle:'Развёрнутые описания типов',
+    typesSub:'Три социальных типа с примерами из общеизвестной истории.',
+    bfiTitle:'Шкалы коммуникативных признаков',
     bfiSub:'Что означают высокие и низкие значения',
     yes:'Да', no:'Нет',
     ready:'✅ Готово. Сохраните ответ — после этого откроется оценка ИИ по этому герою.',
@@ -615,11 +619,11 @@ const I18N = {
     savedTitle:'Ответ сохранён',
     savedBody:'Ответ записан. Ниже можно сравнить его с оценкой ИИ. Вы уже ответили по героям:',
     heroAiTitle:'📊 Оценка ИИ по этому герою',
-    heroAiNote:'Тип по Гумилёву и профиль BFI — сравните со своим ответом.',
+    heroAiNote:'Тип героя и профиль признаков — сравните со своим ответом.',
     cont:'Продолжить',
-    revealLock:'🔒 Показать оценку ИИ по BFI (осталось {n})',
-    revealShow:'🔓 Показать оценку ИИ по BFI',
-    revealHide:'🙈 Скрыть оценку ИИ по BFI',
+    revealLock:'🔒 Показать оценку ИИ (осталось {n} героев)',
+    revealShow:'🔓 Показать оценку ИИ',
+    revealHide:'🙈 Скрыть оценку ИИ',
     aiTitle:'📊 Оценка ИИ по Big Five Inventory · {book}',
     aiNote:'Нажмите на карточку, чтобы раскрыть радар, числовые значения и пояснение полюсов.',
     yourChoice:' · ваш выбор: ',
@@ -632,19 +636,20 @@ const I18N = {
     emailSend:'Свяжитесь со мной',
     emailOk:'Спасибо! Мы свяжемся с вами.',
     err:'Ошибка загрузки. Обновите страницу.',
-    footer:'Митчелл · Скотт · Толстой — Big Five Inventory + типология Гумилёва',
+    footer:'Митчелл · Скотт · Толстой — Big Five Inventory',
     loading:'Загрузка…'
   },
   en: {
-    title:'🧭 Passionary hero quiz · Big Five',
-    subtitle:'Rate the Gumilev type, mark BFI traits — then compare with the AI estimate.',
+    title:'🧭 Social type assessment of literary heroes',
+    subtitle:'Rate the literary hero type — then compare with other readers and the AI estimate.',
+    pickBook:'Pick a book',
     pick:'Pick a hero to begin',
-    step1:'🤔 Step 1. Which Gumilev type fits this hero?',
-    step2:'🧠 Step 2. Which BFI traits does this hero show?',
+    step1:'🤔 Step 1. Which social type fits this hero?',
+    step2:'🧠 Step 2. Which other communicative traits does this hero show?',
     step2note:'Mark Yes or No for each of the five scales.',
-    typesTitle:'Gumilev typology',
-    typesSub:'Short guides before you choose',
-    bfiTitle:'Big Five Inventory scales',
+    typesTitle:'Detailed type descriptions',
+    typesSub:'Three social types with well-known historical examples.',
+    bfiTitle:'Communicative trait scales',
     bfiSub:'What high and low scores mean',
     yes:'Yes', no:'No',
     ready:'✅ Done. Save the answer to see the AI estimate for this hero.',
@@ -657,11 +662,11 @@ const I18N = {
     savedTitle:'Answer saved',
     savedBody:'Saved. You can now compare it with the AI estimate. You already answered:',
     heroAiTitle:'📊 AI estimate for this hero',
-    heroAiNote:'Gumilev type and BFI profile — compare with your answer.',
+    heroAiNote:'Hero type and trait profile — compare with your answer.',
     cont:'Continue',
-    revealLock:'🔒 Show AI BFI estimate ({n} left)',
-    revealShow:'🔓 Show AI BFI estimate',
-    revealHide:'🙈 Hide AI BFI estimate',
+    revealLock:'🔒 Show AI estimate ({n} heroes left)',
+    revealShow:'🔓 Show AI estimate',
+    revealHide:'🙈 Hide AI estimate',
     aiTitle:'📊 AI Big Five estimate · {book}',
     aiNote:'Tap a card to expand the radar, numeric scores, and pole notes.',
     yourChoice:' · your pick: ',
@@ -674,7 +679,7 @@ const I18N = {
     emailSend:'Contact me',
     emailOk:'Thanks! We will contact you.',
     err:'Load error. Refresh the page.',
-    footer:'Mitchell · Scott · Tolstoy — Big Five Inventory + Gumilev typology',
+    footer:'Mitchell · Scott · Tolstoy — Big Five Inventory',
     loading:'Loading…'
   }
 };
@@ -773,8 +778,11 @@ function render() {
   app.innerHTML = `
     <div class="topbar">${langHtml()}</div>
     <div class="brand"><h1>${t().title}</h1><p>${t().subtitle}</p></div>
-    <div class="book-tabs" id="bookTabs">
-      ${books.map((b,i)=>`<button type="button" data-book="${i}" class="${i===bookIdx?'active':''}">${bookTitle(b)}</button>`).join('')}
+    <div class="book-picker">
+      <div class="book-picker-label">${t().pickBook}</div>
+      <div class="book-tabs" id="bookTabs">
+        ${books.map((b,i)=>`<button type="button" data-book="${i}" class="${i===bookIdx?'active':''}">${bookTitle(b)}</button>`).join('')}
+      </div>
     </div>
     <div class="progress-bar">
       <div class="progress-fill" style="width:${pct}%"></div>
