@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Passion · Hero quiz",
-  description: "Anonymous Gumilev + Big Five literary hero survey",
+  description: "Anonymous literary hero social-type survey",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

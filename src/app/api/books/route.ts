@@ -20,8 +20,6 @@ export async function GET() {
         id: h.id,
         nameRu: h.nameRu,
         nameEn: h.nameEn,
-        subRu: h.subRu,
-        subEn: h.subEn,
         group: h.group,
         descRu: h.descRu,
         descEn: h.descEn,

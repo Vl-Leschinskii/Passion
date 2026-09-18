@@ -22,8 +22,8 @@ export type ApiHero = {
   id: string;
   nameRu: string;
   nameEn: string;
-  subRu: string;
-  subEn: string;
+  subRu?: string;
+  subEn?: string;
   group: GumilevGroup;
   descRu: string;
   descEn: string;
@@ -187,7 +187,7 @@ function HeroAiCard({
   hero: ApiHero;
   userGuess?: GumilevGroup;
   locale: Locale;
-  t: (typeof translations)["ru"];
+  t: (typeof translations)[Locale];
   axisLabels: string[];
   defaultOpen?: boolean;
 }) {

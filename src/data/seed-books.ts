@@ -31,8 +31,8 @@ export const SEED_BOOKS: SeedBook[] = [
       {
         nameRu: "Скарлетт О’Хара",
         nameEn: "Scarlett O'Hara",
-        subRu: "Пассионарий-прагматик",
-        subEn: "Pragmatic passionary",
+        subRu: "Активный прагматик",
+        subEn: "Active pragmatist",
         group: "passi",
         descRu:
           "Выживает любой ценой, ломает правила, но не способна на бескорыстную жертву. Умна, прагматична, эмоционально нестабильна.",
@@ -43,8 +43,8 @@ export const SEED_BOOKS: SeedBook[] = [
       {
         nameRu: "Ретт Батлер",
         nameEn: "Rhett Butler",
-        subRu: "Пассионарий-циник",
-        subEn: "Cynical passionary",
+        subRu: "Энергичный-циник",
+        subEn: "Cynical energetic",
         group: "passi",
         descRu:
           "Умён, независим, любит Скарлетт по-своему. Открыт новому, дисциплинирован, но не жертвует собой до конца.",
@@ -55,8 +55,8 @@ export const SEED_BOOKS: SeedBook[] = [
       {
         nameRu: "Мелани Уилкс",
         nameEn: "Melanie Wilkes",
-        subRu: "Гармоник с пассионарным ядром",
-        subEn: "Harmonic with a passionary core",
+        subRu: "Гармоник с энергичным ядром",
+        subEn: "Harmonic with a energetic core",
         group: "garm",
         descRu:
           "Тихая сила, моральный компас, умирает за других. Альтруистична, добросовестна, эмоционально устойчива.",
@@ -67,8 +67,8 @@ export const SEED_BOOKS: SeedBook[] = [
       {
         nameRu: "Эшли Уилкс",
         nameEn: "Ashley Wilkes",
-        subRu: "Субпассионарий-романтик",
-        subEn: "Romantic subpassionary",
+        subRu: "Пассивный-романтик",
+        subEn: "Passive romantic",
         group: "sub",
         descRu:
           "Умён, но беспомощен, живёт прошлым, не способен к действию. Высокая открытость при низкой добросовестности.",
@@ -91,8 +91,8 @@ export const SEED_BOOKS: SeedBook[] = [
       {
         nameRu: "Джеральд О’Хара",
         nameEn: "Gerald O'Hara",
-        subRu: "Пассионарий на спаде",
-        subEn: "Declining passionary",
+        subRu: "Энергичный на спаде",
+        subEn: "Declining energetic",
         group: "passi",
         descRu:
           "Сила в прошлом, в настоящем — инерция и гибель. Импульсивен, экстравертирован, ригиден.",
@@ -134,8 +134,8 @@ export const SEED_BOOKS: SeedBook[] = [
       {
         nameRu: "Айвенго",
         nameEn: "Ivanhoe",
-        subRu: "Пассионарий-рыцарь",
-        subEn: "Knight passionary",
+        subRu: "Энергичный-рыцарь",
+        subEn: "Knight energetic",
         group: "passi",
         descRu:
           "Честь, любовь, готовность умереть за идею. Дисциплинирован, экстравертирован, устойчив.",
@@ -146,8 +146,8 @@ export const SEED_BOOKS: SeedBook[] = [
       {
         nameRu: "Ревекка",
         nameEn: "Rebecca",
-        subRu: "Пассионарий-целительница",
-        subEn: "Healer passionary",
+        subRu: "Энергичный-целительница",
+        subEn: "Healer energetic",
         group: "passi",
         descRu:
           "Мудрая, самоотверженная, сильнее всех духом. Открыта, добросовестна, альтруистична.",
@@ -158,8 +158,8 @@ export const SEED_BOOKS: SeedBook[] = [
       {
         nameRu: "Ричард Львиное Сердце",
         nameEn: "Richard the Lionheart",
-        subRu: "Пассионарий-воин",
-        subEn: "Warrior passionary",
+        subRu: "Энергичный-воин",
+        subEn: "Warrior energetic",
         group: "passi",
         descRu:
           "Величие и хаос, герой без стратегии. Максимальная экстраверсия и открытость, низкая добросовестность.",
@@ -170,8 +170,8 @@ export const SEED_BOOKS: SeedBook[] = [
       {
         nameRu: "Бриан де Буагильбер",
         nameEn: "Brian de Bois-Guilbert",
-        subRu: "Деструктивный пассионарий",
-        subEn: "Destructive passionary",
+        subRu: "Деструктивный энергичный",
+        subEn: "Destructive energetic",
         group: "passi",
         descRu: "Сила без чести, страсть без любви. Высокая воля, низкая доброжелательность.",
         descEn: "Strength without honor, passion without love. High will, low agreeableness.",
@@ -202,8 +202,8 @@ export const SEED_BOOKS: SeedBook[] = [
       {
         nameRu: "Локсли (Робин Гуд)",
         nameEn: "Locksley (Robin Hood)",
-        subRu: "Пассионарий-народный герой",
-        subEn: "Folk-hero passionary",
+        subRu: "Энергичный-народный герой",
+        subEn: "Folk-hero energetic",
         group: "passi",
         descRu: "Лидер, защитник, мастер тактики. Экстраверт, добросовестен, альтруистичен.",
         descEn: "Leader, protector, master of tactics. Extraverted, conscientious, altruistic.",
@@ -231,8 +231,8 @@ export const SEED_BOOKS: SeedBook[] = [
       {
         nameRu: "Андрей Болконский",
         nameEn: "Andrei Bolkonsky",
-        subRu: "Пассионарий-интеллектуал",
-        subEn: "Intellectual passionary",
+        subRu: "Энергичный-интеллектуал",
+        subEn: "Intellectual energetic",
         group: "passi",
         descRu:
           "Ищет смысл, но оторван от людей. Высокая открытость и добросовестность, низкая доброжелательность.",
@@ -273,8 +273,8 @@ export const SEED_BOOKS: SeedBook[] = [
       {
         nameRu: "Элен Курагина",
         nameEn: "Hélène Kuragina",
-        subRu: "Деструктивный пассионарий",
-        subEn: "Destructive passionary",
+        subRu: "Деструктивный энергичный",
+        subEn: "Destructive energetic",
         group: "passi",
         descRu: "Холодная, расчётливая, пустая. Экстравертирована, но крайне низкая доброжелательность.",
         descEn: "Cold, calculating, empty. Extraverted with extremely low agreeableness.",
@@ -283,8 +283,8 @@ export const SEED_BOOKS: SeedBook[] = [
       {
         nameRu: "Анатоль Курагин",
         nameEn: "Anatole Kuragin",
-        subRu: "Субпассионарий-гедонист",
-        subEn: "Hedonist subpassionary",
+        subRu: "Пассивный-гедонист",
+        subEn: "Passive hedonist",
         group: "sub",
         descRu: "Красив, глуп, разрушителен. Импульсивен, низкая добросовестность и доброжелательность.",
         descEn: "Handsome, foolish, destructive. Impulsive; low conscientiousness and agreeableness.",
@@ -293,8 +293,8 @@ export const SEED_BOOKS: SeedBook[] = [
       {
         nameRu: "Кутузов",
         nameEn: "Kutuzov",
-        subRu: "Пассионарий-стратег",
-        subEn: "Strategist passionary",
+        subRu: "Энергичный-стратег",
+        subEn: "Strategist energetic",
         group: "passi",
         descRu: "Мудрость, терпение, победа через отступление. Добросовестен, устойчив, альтруистичен.",
         descEn: "Wisdom, patience, victory through retreat. Conscientious, stable, altruistic.",
@@ -313,8 +313,8 @@ export const SEED_BOOKS: SeedBook[] = [
       {
         nameRu: "Наполеон Бонапарт",
         nameEn: "Napoleon Bonaparte",
-        subRu: "Пассионарий-завоеватель",
-        subEn: "Conqueror passionary",
+        subRu: "Энергичный-завоеватель",
+        subEn: "Conqueror energetic",
         group: "passi",
         descRu:
           "Гигант воли и амбиций; для Толстого — символ исторической иллюзии. Максимальная экстраверсия, низкая доброжелательность.",

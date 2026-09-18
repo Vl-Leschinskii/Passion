@@ -55,8 +55,6 @@ async function loadBootstrap() {
         id: h.id,
         nameRu: h.nameRu,
         nameEn: h.nameEn,
-        subRu: h.subRu,
-        subEn: h.subEn,
         group: h.group as GumilevGroup,
         descRu: h.descRu,
         descEn: h.descEn,

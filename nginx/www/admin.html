@@ -173,7 +173,7 @@
 
     <div class="card">
       <h3 style="margin-bottom:12px">По книгам</h3>
-      <div style="overflow:auto"><table><thead><tr><th>Книга</th><th>Ответы</th><th>Пасс.</th><th>Гарм.</th><th>Суб.</th></tr></thead><tbody id="byBook"></tbody></table></div>
+      <div style="overflow:auto"><table><thead><tr><th>Книга</th><th>Ответы</th><th>Тип1</th><th>Тип2</th><th>Тип3</th></tr></thead><tbody id="byBook"></tbody></table></div>
     </div>
 
     <div class="card">
@@ -194,7 +194,7 @@
 </div>
 <script>
 const API = '/passion/api/admin';
-const GUESS = { passi: 'Пассионарий', garm: 'Гармоничный', sub: 'Субпассионарий' };
+const GUESS = { passi: 'Тип1', garm: 'Тип2', sub: 'Тип3' };
 const BFI_LABEL = { O: 'Открытость', C: 'Добросовестность', E: 'Экстраверсия', A: 'Доброжелательность', N: 'Нейротизм' };
 
 async function api(path, opts = {}) {
