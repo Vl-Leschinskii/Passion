@@ -29,9 +29,12 @@
   .brand p { font-size: 0.85rem; opacity: 0.55; margin-top: 6px; }
 
   /* ---------- BOOK TABS ---------- */
+  .book-picker { text-align: center; margin-bottom: 20px; }
+  .book-picker-label {
+    font-size: 0.85rem; opacity: 0.55; margin-bottom: 10px;
+  }
   .book-tabs {
     display: flex; justify-content: center; flex-wrap: wrap; gap: 10px;
-    margin-bottom: 20px;
   }
   .book-tabs button {
     background: rgba(255,255,255,0.06);
@@ -120,7 +123,7 @@
     color: #cfe0f0;
   }
 
-  /* ---------- TYPE INFO (Гумилёв) ---------- */
+  /* ---------- TYPE INFO ---------- */
   .types-block {
     margin: 26px 0 10px;
     padding: 20px 18px;
@@ -433,11 +436,14 @@
 <div class="app">
 
   <div class="brand">
-    <h1>🧭 Пассионарный тест героев · Big Five</h1>
-    <p>Оцените тип героя по Гумилёву, отметьте признаки BFI — и сравните с оценкой ИИ.</p>
+    <h1>🧭 Оценка литературных героев</h1>
+    <p>Оцените тип литературного героя — потом сравните с оценкой других читателей и ИИ</p>
   </div>
 
-  <div class="book-tabs" id="bookTabs"></div>
+  <div class="book-picker">
+    <div class="book-picker-label">Выберите книгу</div>
+    <div class="book-tabs" id="bookTabs"></div>
+  </div>
 
   <div class="progress-bar">
     <div class="progress-fill" id="progressFill" style="width:0%"></div>
@@ -454,7 +460,7 @@
 
   <div class="ai-section" id="aiSection"></div>
 
-  <div class="footer">Митчелл · Скотт · Толстой — Big Five Inventory + типология Гумилёва</div>
+  <div class="footer">Митчелл · Скотт · Толстой — Big Five Inventory</div>
 </div>
 
 <script>
@@ -496,9 +502,9 @@ const BFI_SCALES = [
   }
 ];
 
-/* Соответствие «тип Гумилёва ↔ полюс BFI» (по Зимина, 2009).
+/* Соответствие «тип героя ↔ полюс BFI» (по Зимина, 2009).
    Используется только для пояснений в карточках оценки ИИ. */
-const GUMILEV_BFI_TABLE = [
+const TYPE_BFI_TABLE = [
   { scale:'Экстраверсия — Интроверсия',        p:'Экстраверсия',           g:'Интроверсия',        s:'Интроверсия' },
   { scale:'Привязанность — Обособленность (A)', p:'Обособленность',         g:'Привязанность',      s:'Обособленность' },
   { scale:'Самоконтроль — Импульсивность (C)',  p:'Импульсивность',         g:'Самоконтроль',       s:'Импульсивность' },
@@ -515,7 +521,7 @@ const BFI_QUESTIONS = [
 ];
 
 /* =========================================================
-   ТИПОЛОГИЯ ПО ГУМИЛЁВУ (развёрнутые описания + примеры)
+   ТИПОЛОГИЯ ГЕРОЕВ (развёрнутые описания + примеры)
    ========================================================= */
 const GROUP_META = {
   passi: {
@@ -714,19 +720,19 @@ function renderHeroGrid() {
 }
 
 /* =========================================================
-   БЛОК «РАЗВЁРНУТЫЕ ОПИСАНИЯ ТИПОВ ПО ГУМИЛЁВУ»
+   БЛОК «РАЗВЁРНУТЫЕ ОПИСАНИЯ ТИПОВ»
    ========================================================= */
 function buildTypesBlock() {
   const wrap = document.createElement('div');
   wrap.className = 'types-block';
 
   const h = document.createElement('h3');
-  h.textContent = '📚 Развёрнутые описания типов по Гумилёву';
+  h.textContent = '📚 Развёрнутые описания типов';
   wrap.appendChild(h);
 
   const p = document.createElement('p');
   p.className = 'sub';
-  p.textContent = 'Три типа пассионарности с примерами из общеизвестной истории.';
+  p.textContent = 'Три социальных типа с примерами из общеизвестной истории.';
   wrap.appendChild(p);
 
   const info = document.createElement('div');
@@ -751,7 +757,7 @@ function buildBfiScalesBlock() {
   wrap.className = 'bfi-scales';
 
   const h = document.createElement('h3');
-  h.textContent = '🎯 Шкалы Big Five Inventory (BFI)';
+  h.textContent = '🎯 Шкалы коммуникативных признаков';
   wrap.appendChild(h);
 
   const p = document.createElement('p');
@@ -782,7 +788,7 @@ function buildBfiScalesBlock() {
    РЕНДЕР РАБОЧЕЙ ОБЛАСТИ
    Порядок:
      1. Заголовок героя.
-     2. Шаг 1 — выбор типа по Гумилёву.
+     2. Шаг 1 — выбор типа.
      3. Развёрнутые описания типов (с примерами).
      4. Шаг 2 — BFI-вопрос Да/Нет.
      5. Справка по шкалам BFI.
@@ -816,7 +822,7 @@ function renderWorkspace() {
   /* 2. Шаг 1 — выбор типа */
   const q1 = document.createElement('div');
   q1.className = 'question';
-  q1.textContent = '🤔 Шаг 1. К какому типу по Гумилёву вы отнесёте этого героя?';
+  q1.textContent = '🤔 Шаг 1. К какому социальному типу вы отнесёте этого героя?';
   workspaceEl.appendChild(q1);
 
   const row = document.createElement('div');
@@ -843,7 +849,7 @@ function renderWorkspace() {
   const bfiBlock = document.createElement('div');
   bfiBlock.className = 'bfi-block';
   bfiBlock.innerHTML = `
-    <h3>🧠 Шаг 2. Какими признаками BFI, по вашему мнению, обладает герой?</h3>
+    <h3>🧠 Шаг 2. Какими еще коммуникативными признаками по вашему мнению, обладает герой?</h3>
     <p class="bfi-note">Отметьте «Да» или «Нет» по каждой из пяти шкал.</p>
   `;
 
@@ -924,15 +930,15 @@ function renderBottomAction() {
 
   if (!allDone) {
     btn.disabled = true;
-    btn.textContent = `🔒 Показать оценку ИИ по BFI (осталось ${total - done})`;
+    btn.textContent = `🔒 Показать оценку ИИ (осталось ${total - done} героев)`;
   } else if (revealed) {
-    btn.textContent = '🙈 Скрыть оценку ИИ по BFI';
+    btn.textContent = '🙈 Скрыть оценку ИИ';
     btn.onclick = () => {
       aiRevealed[bookKey(currentBook)] = false;
       renderAll();
     };
   } else {
-    btn.textContent = '🔓 Показать оценку ИИ по BFI';
+    btn.textContent = '🔓 Показать оценку ИИ';
     btn.onclick = () => {
       aiRevealed[bookKey(currentBook)] = true;
       renderAll();
