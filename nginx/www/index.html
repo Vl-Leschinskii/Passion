@@ -513,7 +513,13 @@
   <div class="center">Загрузка…</div>
 </div>
 <script>
-
+window.onerror = function (msg, src, line, col) {
+  var el = document.getElementById('app');
+  if (el && !el.dataset.ready) el.textContent = 'Ошибка скрипта: ' + msg + ' (' + line + ':' + col + ')';
+};
+</script>
+<script>
+(function () {
 const API = '/passion/api';
 const AXES = {
   ru: ['Открытость','Добросовестность','Экстраверсия','Доброжелательность','Нейротизм'],
@@ -684,7 +690,14 @@ const I18N = {
   }
 };
 
-let locale = localStorage.getItem('passion_locale') === 'en' ? 'en' : 'ru';
+function readLocale() {
+  try { return localStorage.getItem('passion_locale') === 'en' ? 'en' : 'ru'; }
+  catch (e) { return 'ru'; }
+}
+function writeLocale(value) {
+  try { localStorage.setItem('passion_locale', value); } catch (e) {}
+}
+let locale = readLocale();
 let books = [];
 let status = 'in_progress';
 let progress = {guesses:{}, bfi:{}};
@@ -708,7 +721,9 @@ const isDone = (slug, id) => {
 const bookDoneCount = (book) => book.heroes.filter(h => isDone(book.slug, h.id) || saved.has(key(book.slug, h.id))).length;
 
 async function boot() {
-  document.getElementById('app').innerHTML = `<div class="center">${t().loading}</div>`;
+  const app = document.getElementById('app');
+  app.dataset.ready = '1';
+  app.innerHTML = `<div class="center">${t().loading}</div>`;
   try {
     const [meRes, booksRes] = await Promise.all([
       fetch(API + '/me', {credentials:'same-origin', cache:'no-store'}),
@@ -818,7 +833,7 @@ function langHtml() {
 function bindLang() {
   document.querySelectorAll('[data-l]').forEach(btn => btn.onclick = () => {
     locale = btn.dataset.l;
-    localStorage.setItem('passion_locale', locale);
+    writeLocale(locale);
     render();
   });
 }
@@ -1123,8 +1138,11 @@ async function doSave() {
   render();
 }
 
-boot();
-
+boot().catch((e) => {
+  const el = document.getElementById('app');
+  if (el) el.textContent = (t().err || 'Ошибка загрузки') + ' ' + (e && e.message ? e.message : '');
+});
+})();
 </script>
 </body>
 </html>
