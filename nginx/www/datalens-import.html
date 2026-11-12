@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Импорт воркбука DataLens</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f4f6f8;
+      --card: #fff;
+      --text: #1d2433;
+      --muted: #5d6b82;
+      --line: #d7dee8;
+      --accent: #1a73e8;
+      --danger: #b42318;
+      --ok: #067647;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font: 16px/1.45 "Segoe UI", sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
+    main {
+      width: min(760px, calc(100% - 32px));
+      margin: 32px auto 48px;
+    }
+    h1 { margin: 0 0 8px; font-size: 28px; }
+    p.lead { margin: 0 0 20px; color: var(--muted); }
+    form, .result {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 20px;
+    }
+    label { display: block; margin: 14px 0 6px; font-weight: 600; }
+    input[type="text"], textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font: inherit;
+    }
+    textarea { min-height: 88px; resize: vertical; }
+    .drop {
+      margin-top: 8px;
+      border: 1px dashed #9aadc4;
+      border-radius: 10px;
+      padding: 22px;
+      text-align: center;
+      background: #f8fbff;
+    }
+    .drop.over { border-color: var(--accent); background: #e8f1ff; }
+    button {
+      margin-top: 18px;
+      border: 0;
+      border-radius: 8px;
+      background: var(--accent);
+      color: #fff;
+      font: inherit;
+      font-weight: 650;
+      padding: 10px 16px;
+      cursor: pointer;
+    }
+    button:disabled { opacity: 0.6; cursor: default; }
+    .result { margin-top: 16px; }
+    .ok { color: var(--ok); }
+    .err { color: var(--danger); }
+    ul { margin: 8px 0 0; padding-left: 18px; }
+    a { color: var(--accent); }
+    code { font-family: ui-monospace, monospace; font-size: 0.92em; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Импорт воркбука</h1>
+    <p class="lead">Выберите JSON-файл экспорта DataLens. Файл должен содержать поля <code>hash</code> и <code>export</code>. Перед отправкой войдите в <a href="/auth/signin">DataLens</a> в этом же адресе.</p>
+    <form id="import-form">
+      <label for="title">Название воркбука</label>
+      <input id="title" name="title" type="text" required placeholder="Например, Аналитика">
+      <label for="description">Описание</label>
+      <textarea id="description" name="description" placeholder="Необязательно"></textarea>
+      <label for="file">JSON-файл</label>
+      <div class="drop" id="drop">
+        <input id="file" name="file" type="file" accept="application/json,.json" required>
+        <div id="file-meta"></div>
+      </div>
+      <button id="submit" type="submit">Импортировать</button>
+    </form>
+    <section class="result" id="result" hidden></section>
+  </main>
+  <script>
+    const form = document.getElementById("import-form");
+    const fileInput = document.getElementById("file");
+    const drop = document.getElementById("drop");
+    const fileMeta = document.getElementById("file-meta");
+    const result = document.getElementById("result");
+    const submit = document.getElementById("submit");
+
+    function setFile(file) {
+      const transfer = new DataTransfer();
+      transfer.items.add(file);
+      fileInput.files = transfer.files;
+      showFile(file);
+    }
+
+    function showFile(file) {
+      fileMeta.textContent = file ? file.name + " (" + Math.ceil(file.size / 1024) + " КБ)" : "";
+    }
+
+    fileInput.addEventListener("change", () => showFile(fileInput.files[0]));
+    ["dragover", "dragenter"].forEach((name) => drop.addEventListener(name, (event) => {
+      event.preventDefault();
+      drop.classList.add("over");
+    }));
+    ["dragleave", "drop"].forEach((name) => drop.addEventListener(name, (event) => {
+      event.preventDefault();
+      drop.classList.remove("over");
+    }));
+    drop.addEventListener("drop", (event) => {
+      const file = event.dataTransfer.files && event.dataTransfer.files[0];
+      if (file) setFile(file);
+    });
+
+    function connectionTypes(data) {
+      const found = new Set();
+      const walk = (value) => {
+        if (!value || typeof value !== "object") return;
+        if (typeof value.db_type === "string") found.add(value.db_type);
+        Object.values(value).forEach(walk);
+      };
+      walk(data);
+      return [...found];
+    }
+
+    async function readExport(file) {
+      const parsed = JSON.parse(await file.text());
+      const data = parsed && parsed.hash && parsed.export ? parsed : parsed && parsed.data;
+      if (!data || typeof data.hash !== "string" || !data.export) {
+        throw new Error("В файле нет объекта экспорта с полями hash и export.");
+      }
+      return data;
+    }
+
+    async function api(path, body) {
+      const response = await fetch(path, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          "Accept-Language": "ru"
+        },
+        body: JSON.stringify(body)
+      });
+      const text = await response.text();
+      let payload = null;
+      try { payload = text ? JSON.parse(text) : null; } catch (error) { payload = { message: text }; }
+      if (response.status === 401 || response.status === 403) {
+        throw new Error("Сессия не найдена. Откройте вход DataLens и войдите, затем вернитесь на эту страницу.");
+      }
+      if (!response.ok) {
+        const message = payload && (payload.message || payload.error) || response.statusText;
+        throw new Error(typeof message === "string" ? message : JSON.stringify(message));
+      }
+      return payload;
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        "\"": "&quot;",
+        "'": "&#39;"
+      }[char]));
+    }
+
+    function render(html) {
+      result.hidden = false;
+      result.innerHTML = html;
+    }
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const file = fileInput.files[0];
+      if (!file) return;
+      submit.disabled = true;
+      render("<p>Читаю файл…</p>");
+      let savedPath = "";
+      try {
+        const text = await file.text();
+        const parsed = JSON.parse(text);
+        const title = document.getElementById("title").value.trim();
+        const description = document.getElementById("description").value.trim();
+        render("<p>Сохраняю JSON в проект до импорта в DataLens…</p>");
+        const saved = await api("/import/save", {
+          title,
+          description,
+          originalName: file.name,
+          raw: parsed
+        });
+        savedPath = saved.path || "";
+        const data = await readExport(file);
+        const types = connectionTypes(data);
+        render("<p>Файл сохранён: <code>" + escapeHtml(savedPath) + "</code>. Подключения: " + escapeHtml(types.join(", ") || "не найдены") + ". Запускаю импорт.</p>");
+        const started = await api("/gateway/root/metaManager/startWorkbookImport", {
+          title,
+          description: description || undefined,
+          collectionId: null,
+          data
+        });
+        const importId = started.importId;
+        const workbookId = started.workbookId;
+        let status = "pending";
+        let last = started;
+        for (let attempt = 0; attempt < 90 && status === "pending"; attempt += 1) {
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+          last = await api("/gateway/root/metaManager/getWorkbookImportStatus", { importId });
+          status = last.status || "pending";
+          render("<p>JSON сохранён: <code>" + escapeHtml(savedPath) + "</code></p><p>Статус: <strong>" + status + "</strong>, прогресс " + (last.progress ?? 0) + "%.</p>");
+        }
+        const notes = Array.isArray(last.notifications) ? last.notifications : [];
+        const noteHtml = notes.length
+          ? "<ul>" + notes.map((item) => "<li>" + escapeHtml((item.level || "") + " " + (item.message || item.code || "")) + "</li>").join("") + "</ul>"
+          : "";
+        const savedNote = savedPath ? "<p>JSON сохранён: <code>" + escapeHtml(savedPath) + "</code></p>" : "";
+        if (status === "success") {
+          render(savedNote + '<p class="ok">Воркбук импортирован.</p><p><a href="/workbooks/' + workbookId + '">Открыть воркбук</a></p>' + noteHtml);
+        } else {
+          render(savedNote + '<p class="err">Импорт завершился со статусом ' + status + '.</p>' + noteHtml);
+        }
+      } catch (error) {
+        const savedNote = savedPath ? "<p>JSON сохранён: <code>" + escapeHtml(savedPath) + "</code></p>" : "";
+        render(savedNote + '<p class="err">' + escapeHtml(error.message) + '</p>');
+      } finally {
+        submit.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
